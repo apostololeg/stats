@@ -1,0 +1,16 @@
+@import '~theme'
+
+.scrolledView
+  height 100%
+
+.scrolledViewInner
+  max-width 1000px
+  margin 0 auto
+  padding env(safe-area-inset-top) 0
+  flex-grow 1
+
+  @media (orientation: landscape) and (max-width: 1000px) and (min-aspect-ratio: 2/1)
+    padding env(safe-area-inset-top) 0
+
+.short
+  max-width 600px

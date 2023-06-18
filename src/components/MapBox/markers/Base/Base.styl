@@ -1,0 +1,26 @@
+.root
+  position relative
+  height 16px
+  width @height
+  border-radius 50%
+  background-color var(--decent-color-alpha-800) !important
+  box-shadow 0 0 0 1px var(--decent-color) !important
+  transition transform .1s ease-out, background-color .1s ease-out, box-shadow .3s ease-out
+
+  &::before
+    content ''
+    position absolute
+    left -30%
+    right -30%
+    top -30%
+    bottom -30%
+    border-radius inherit
+
+  &:hover
+  &.selected
+    transform scale(1.2)
+    z-index 1
+
+  &.selected
+    box-shadow 0 0 0 4px var(--active-color-alpha-500),
+              0 0 1px var(--decent-color) !important

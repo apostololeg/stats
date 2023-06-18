@@ -1,0 +1,151 @@
+{
+  "extends": [
+    "airbnb",
+    "prettier",
+    "prettier/react",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["react", "@typescript-eslint"],
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "config/webpack/dev.js"
+      }
+    }
+  },
+  "rules": {
+    // When importing files you do not need to add file extensions for the following extensions
+    "import/extensions": "off",
+    // For absolute import
+    "import/no-unresolved": "off",
+    "import/no-duplicates": "off",
+    "import/no-named-as-default": "off",
+    "import/no-named-as-default-member": "off",
+    // Allowing importing from dev deps (for stories and tests)
+    "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
+    "lines-between-class-members": "off",
+    "no-case-declarations": "off",
+    "no-console": "off",
+    // Allowing ++ on numbers
+    "no-plusplus": "off",
+    // Cannot reassign function parameters but allowing modification
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
+    "no-shadow": 1,
+    // Enforce consistent usage of destructuring assignment of props, state, and context
+    "react/destructuring-assignment": ["off"],
+    // Allowing jsx in files with any file extension (old components have jsx but not the extension)
+    "react/jsx-filename-extension": "off",
+    // JSX props must be in alphabetical order
+    // Disabled as this is creating too much noise in logs and is not being actively addressed
+    "react/jsx-sort-props": "off",
+    // Disallow JSX props spreading
+    "react/jsx-props-no-spreading": 0,
+    // Prevent using this.state within a this.setState
+    "react/no-access-state-in-setstate": ["off"],
+    // Allow use setState in componentDidUpdate
+    "react/no-did-update-set-state": "off",
+    // This was turned off for wc - but should be re-enabled eventually
+    "react/no-unknown-property": ["off"],
+    // Prevent missing props validation in a React component definition
+    "react/prop-types": ["off"],
+    // Enforce ES5 or ES6 class for React Components
+    "react/prefer-es6-class": [1],
+    // Prevent missing React when using JSX
+    "react/react-in-jsx-scope": ["off"],
+    "react/state-in-constructor": ["off"],
+    "react/static-property-placement": ["off"],
+    "no-continue": "off",
+    "no-nested-ternary": 1,
+    // Disallow more than 1 empty lines
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ],
+    "no-unused-expressions": "off", // see "@typescript-eslint/no-unused-expressions"
+    "no-unused-vars": [1, {
+      "args": "none"
+    }],
+    // Enforce no padding within blocks
+    "padded-blocks": ["error", "never"],
+    // Adding 'skipShapeProps' as the rule has issues with correctly handling PropTypes.shape
+    "react/no-unused-prop-types": [
+      "error",
+      {
+        "skipShapeProps": true
+      }
+    ],
+    // Opt out of preferring stateless functions
+    // Rationale: https://extranet.atlassian.com/display/AtlasKit/React+component+conventions
+    "react/prefer-stateless-function": "off",
+    // default props not required for optional values
+    "react/require-default-props": "off",
+    "react/sort-comp": [1, {
+      "order": [
+        "instance-variables",
+        "constructor",
+        "lifecycle",
+        "everything-else",
+        "render"
+      ]
+    }],
+    // Disallowing the use of variables starting with `_` unless it called on `this`.
+    // Allowed: `this._secret = Symbol()`
+    // Not allowed: `const _secret = Symbol()`
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allowAfterThis": true
+      }
+    ],
+    // All blocks must be wrapped in curly braces {}
+    // Preventing if(condition) return;
+    "curly": 0,
+    // Allowing Math.pow rather than forcing `**`
+    "no-restricted-globals": "warn",
+    "no-restricted-properties": [
+      "off",
+      {
+        "object": "Math",
+        "property": "pow"
+      }
+    ],
+    "no-return-assign": "off",
+    // Opting out of prefer destructuring (nicer with flow in lots of cases)
+    "prefer-destructuring": "off",
+    // Opting out of specific object styles for now
+    "object-curly-newline": "off",
+    // Opting out of specific paren styles for now
+    "function-paren-newline": "off",
+    "jsx-a11y/anchor-is-valid": [ "error", {
+      "components": [ "Link" ],
+      "specialLink": [ "to" ]
+    }],
+    "jsx-a11y/no-redundant-roles": ["off"],
+    "jsx-a11y/control-has-associated-label": ["off"],
+    "@typescript-eslint/explicit-function-return-type": ["off"],
+    "@typescript-eslint/ban-ts-ignore": ["off"],
+    "@typescript-eslint/no-unused-expressions": [
+      "error",
+      {
+        "allowTernary": true
+      }
+    ],
+    "@typescript-eslint/no-use-before-define": ["off"]
+  }
+}

@@ -1,0 +1,18 @@
+dist/
+build/
+uploads/
+node_modules/
+
+# configs
+.gitsecret/keys/random_seed
+.env
+package-lock.json
+yarn-error.log
+!*.secret
+.vscode
+
+# typescript
+tsconfig.tsbuildinfo
+src/***/*.d.ts
+!src/declaration.d.ts
+

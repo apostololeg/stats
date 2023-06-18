@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export $(grep -v '^#' .env | sed 's/ //g' | xargs) && \
+  rsync -av -e ssh build root@${PROD_IP}:${PROD_PATH} --progress --delete-before

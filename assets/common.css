@@ -1,0 +1,53 @@
+@import url('/assets/fonts.css');
+
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: Play;
+  outline: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  font-size: 20px;
+  color: var(--accent-color);
+  /* overscroll-behavior: none; */
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+}
+
+*::selection {
+  background-color: var(--active-color-alpha-500);
+}
+
+h1 {
+  font-size: 160%;
+  padding: 12px 0;
+}
+h2 {
+  font-size: 140%;
+  padding: 10px 0;
+}
+h3 {
+  font-size: 120%;
+  padding: 8px 0;
+}
+h4 {
+  font-size: 115%;
+  padding: 6px 0;
+}
+h5 {
+  font-size: 110%;
+  padding: 4px 0;
+}
+h6 {
+  font-size: 105%;
+  padding: 2px 0;
+}

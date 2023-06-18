@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="<%= htmlWebpackPlugin.options.lang %>">
+  <head>
+    <base href="/" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <!-- <%= htmlWebpackPlugin.options.version %> -->
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="theme-color"
+      content="#e6e6e6"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1a1a1a"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="stylesheet" href="/assets/common.css" />
+  </head>
+  <body>
+    <div id="app-root"></div>
+    <div id="app-modal"></div>
+    <script src="/api/project/client/<%= htmlWebpackPlugin.options.STATS_PROJECT_KEY %>"></script>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+certbot certonly --standalone
+# certbot certonly --webroot -w /root/www/yaltachanges -d yaltachanges.com

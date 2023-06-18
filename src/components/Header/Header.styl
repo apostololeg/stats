@@ -1,0 +1,55 @@
+@import '~theme'
+
+.root
+  display flex
+  flex-direction column
+  justify-content center
+  align-items flex-start
+  width 100%
+  max-width 1000px
+  min-height 80px
+  padding var(--indent-s)
+  padding-top env(safe-area-inset-top)
+  // backdrop-filter blur(50px)
+  // background-color var(--decent-color-alpha-800)
+  // box-shadow 0 0 30px var(--decent-color), 0 0 0 2px var(--decent-color)
+
+
+.logo
+  top -4px
+
+  svg
+    color var(--accent-color) !important
+    transform scale(1.5)
+
+.titleGap
+.title
+  padding 0 20px
+  font-size 150%
+  font-weight bold
+
+.titleGap
+  min-height 2em
+
+.title
+  position relative
+  display flex
+  align-items center
+  flex-grow 1
+  color var(--accent-color) !important
+
+  svg > path:first-child
+    transition fill .2s ease-out
+
+  &:hover svg > path:first-child
+    fill var(--active-color)
+
+.gap
+  width 58px
+
+.keyInput
+  padding var(--indent-m)
+
+  &
+  & label
+    width 100%

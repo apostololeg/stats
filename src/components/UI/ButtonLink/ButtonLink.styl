@@ -1,0 +1,33 @@
+
+.isFloating
+  z-index 1
+  position fixed
+  right var(--indent-l)
+  bottom var(--indent-l)
+  background-color var(--decent-color-alpha-500)
+  backdrop-filter blur(10px)
+  transform scale(1.2)
+
+  &::before
+    content ''
+    position absolute
+    width 150%
+    height 150%
+    left -250%
+    top -250%
+
+  &::after
+    content ''
+    position absolute
+    width calc(100% + 3px)
+    height calc(100% + 3px)
+    box-shadow 0 0 10px var(--decent-color)
+    border-radius inherit
+
+.isRound
+  border-radius 50%
+  backdrop-filter blur(10px)
+  box-shadow 0 0 0 2px var(--accent-color-alpha-200)
+
+  &:hover
+    box-shadow 0 0 0 2px var(--active-color-alpha-500)

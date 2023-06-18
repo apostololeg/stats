@@ -1,0 +1,35 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "experimentalDecorators": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "baseUrl": "src",
+    "incremental": true,
+    "outDir": "./.ts",
+    "paths": {
+      "*": [
+        "*"
+        // Can't accord component-directory-webpack-plugin
+        // https://github.com/microsoft/TypeScript/issues/24116
+        // => https://github.com/microsoft/TypeScript/issues/45402
+        // "*/*"
+      ]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "plugins": ["typescript-eslint-language-service"]
+}

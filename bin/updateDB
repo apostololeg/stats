@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd ./server/prisma && \
+  prisma1 generate && \
+  prisma1 deploy --env-file ../../.env && \
+  cd ../../

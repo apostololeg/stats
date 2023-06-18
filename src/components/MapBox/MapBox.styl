@@ -1,0 +1,72 @@
+@import '~theme'
+
+.root
+  width 100%
+  height calc(100 * var(--vh))
+  flex-grow 1
+
+  &.isPicking
+    z-index 999999
+
+:global(.mapboxgl-control-container)
+  display none
+:global(.mapboxgl-marker):hover
+:global(.mapboxgl-marker.selected)
+  z-index 1
+
+.geoButton
+  z-index 1
+  position absolute
+  right var(--indent-m)
+  bottom var(--indent-m)
+  transition box-shadow .2s ease-out
+
+  [role=img]
+    transform scale(1.2)
+
+  &.isGeolocating
+    pointer-events none
+    animation pulseShadow 1s infinite
+
+    svg
+      animation breath 1s infinite ease-in-out
+
+  @media(max-width: $tablet)
+    &.isHidden
+      display none
+
+@keyframes pulseShadow
+  0%
+    box-shadow 0 0 0 0 var(--active-color-alpha-500)
+  100%
+    box-shadow 0 0 0 20px rgba(0, 0, 0, 0)
+
+@keyframes breath
+  0%
+    transform scale(1)
+  50%
+    transform scale(1.2) rotateZ(90deg)
+  100%
+    transform scale(1)
+
+.pickingMessage
+  position absolute
+  top 20px
+  left 50%
+  height 50px
+  padding 8px 24px
+  border-radius 25px
+  transition .2s ease-out
+  transition-property opacity, transform
+  pointer-events none
+  opacity 0
+  background-color var(--decent-color)
+  box-shadow 0 0 0 2px var(--accent-color-alpha-500)
+  transform translate(-50%, -150%)
+  white-space nowrap
+  font-size 16px
+
+  &.isVisible
+    z-index 1
+    opacity 1
+    transform translate(-50%, 0)

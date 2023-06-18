@@ -1,0 +1,60 @@
+@import '~theme'
+
+html
+body
+  background-color var(--decent-color)
+
+html
+body
+.root
+  height calc(100 * var(--vh))
+  width 100%
+  overflow hidden
+
+.root
+  display flex
+  // flex-direction column
+
+.sidebar
+  display flex
+  flex-direction column
+  flex-shrink 0
+  width 300px
+  background-color var(--accent-color-alpha-50)
+
+.list
+  flex-grow 1
+  padding var(--indent-s)
+
+.listItem
+  width 100%
+
+  & + &
+    margin-top var(--indent-s)
+
+.darkThemeCheckbox
+  position relative
+  display flex
+  justify-content center
+  align-items center
+  height 80px
+  width 100%
+  margin 0 auto
+
+  & > label
+    position absolute
+    width 60px
+    height 60px
+    border-radius 50%
+    transition background-color .2s ease-out
+
+    & > div
+      opacity 0 !important
+
+    &:hover
+      background-color var(--accent-color-alpha-100)
+
+
+.content
+  position relative
+  flex-grow 1

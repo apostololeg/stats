@@ -1,0 +1,25 @@
+$size = 16px
+$halfSize = $size / 2
+
+.root
+  position absolute
+  top $halfSize
+  left 'calc(100% - %s)' % $halfSize
+  display flex
+  align-items center
+  justify-content center
+  height $size
+  min-width $size
+  padding 0 3px
+  box-shadow 0 0 0 1px var(--decent-color-alpha-800)
+  border-radius $halfSize
+  font-weight bold
+  font-size 12px
+
+.theme-red
+  background-color var(--danger-color)
+  color #fff
+
+.theme-default
+  background-color var(--active-color)
+  color #222
