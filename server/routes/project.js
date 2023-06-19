@@ -14,9 +14,7 @@ import { adminMidleware } from './auth';
 import { decodeToken, encodeToken, setCookie } from '../api/auth';
 
 let client = fs.readFileSync(path.resolve(__dirname, '../client.js'), 'utf8');
-client = client
-  .replace('{DOMAIN}', `${DOMAIN}/api`)
-  .replace('{PROTOCOL}', PROTOCOL); //.replaceAll(/ |\n/g, '');
+client = client.replace('{DOMAIN}', `${DOMAIN}/api`); //.replaceAll(/ |\n/g, '');
 
 const router = express.Router();
 

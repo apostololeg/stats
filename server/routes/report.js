@@ -5,6 +5,7 @@ import { decodeToken } from '../api/auth';
 
 import throttle from '../tools/throttle';
 import { getClientToken } from '../tools/tokens';
+import { timezoneCity2Country } from '../tools/timezoneCity2Country';
 
 // import { adminMidleware } from './auth';
 
@@ -74,6 +75,15 @@ router
 
     if (!cid || !projectId || !data.page)
       return res.status(400).send({ ok: false });
+
+    if (data.timeZone) {
+      const country = timezoneCity2Country(data.timeZone);
+
+      if (country) {
+        data.country = country;
+        delete data.timeZone;
+      }
+    }
 
     await db.event.create({
       data: {
