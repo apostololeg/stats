@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import methodOverride from 'method-override';
 import session from 'express-session';
 import compression from 'compression';
+import cors from 'cors';
 
 import { PRODUCTION, SERVER_PORT, JWT_SECRET } from '../config/const';
 
@@ -11,8 +12,8 @@ import routes from './routes';
 
 const app = express();
 
-if (!PRODUCTION) {
-  // on production, nginx will serve the static files
+if (PRODUCTION) {
+  app.use(cors());
 }
 
 app.use(compression());
