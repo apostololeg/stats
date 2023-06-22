@@ -11,8 +11,8 @@ export default createStore('projects', {
     this.items.push(...res.projects);
   },
 
-  async add(name) {
-    const res = await api.post('/project', { data: { name } });
+  async add(data) {
+    const res = await api.post('/project', { data });
 
     this.items.push(res.project);
   },

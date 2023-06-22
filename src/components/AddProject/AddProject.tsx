@@ -6,6 +6,11 @@ import ProjectsStore from 'store/projects';
 
 import S from './AddProject.styl';
 
+const validationSchema = {
+  name: { type: 'string', empty: false },
+  domain: { type: 'string', empty: false },
+};
+
 export default function AddProject() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,10 +19,10 @@ export default function AddProject() {
     if (!isOpen) return setIsOpen(true);
   }, []);
 
-  const onSubmit = useCallback(async ({ name }) => {
+  const onSubmit = useCallback(async ({ name, domain }) => {
     setIsLoading(true);
     try {
-      await ProjectsStore.add(name);
+      await ProjectsStore.add({ name, domain });
     } finally {
       setIsLoading(false);
       setIsOpen(false);
@@ -53,16 +58,17 @@ export default function AddProject() {
     <div className={cn(S.root, isOpen && S.open)}>
       {isOpen ? (
         <Form
-          initialValues={{ name: '' }}
-          validationSchema={{ name: { type: 'string', empty: false } }}
+          initialValues={{ name: '', domain: '' }}
+          validationSchema={validationSchema}
           onSubmit={onSubmit}
         >
           {({ Field }) => (
             <>
+              <Field name="name" label="Name" className={S.field} size="l" />
               <Field
-                name="name"
+                name="domain"
                 label="Domain"
-                placeholder="example.com"
+                placeholder="https://example.com"
                 className={S.field}
                 size="l"
               />

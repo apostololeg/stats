@@ -72,7 +72,9 @@ router
   .post('/', async (req, res) => {
     const data = req.body;
     const { cid, projectId } = decodeToken(getClientToken(req)) ?? {};
-
+    
+    console.log('----report', data, cid, projectId)  
+    
     if (!cid || !projectId || !data.page)
       return res.status(400).send({ ok: false });
 

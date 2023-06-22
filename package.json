@@ -21,6 +21,8 @@
     "server:prod": "NODE_ENV=production babel-node server",
     "db:admin": "BROWSER=none prisma studio --port 4444",
     "db:reset": "prisma migrate reset --skip-seed",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate",
     "client:dev": "DEV_ENV=client webpack-dev-server --config ./config/webpack/dev.js --progress",
     "prod": "yarn build:prod && yarn server:prod",
     "ts": "tsc --noUnusedLocals",

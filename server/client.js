@@ -11,7 +11,7 @@
       method: 'POST',
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' },
-      // credentials: 'same-origin',
+      credentials: 'include',
     });
   };
 
