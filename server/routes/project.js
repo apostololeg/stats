@@ -1,11 +1,11 @@
 import express from 'express';
 
+import db from '../api/db';
 import { PAGE_SIZE } from '../../src/shared/db';
 import { parseIds } from '../../src/shared/parsers';
 
-import db from '../api/db';
-
 import { adminMidleware } from './auth';
+import { allowedOrigins } from './client';
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ let total = 0;
 
 db.project.count().then(n => (total = n));
 
-router
+export default router
   .get('/', async (req, res) => {
     const params = parseIds(req.query, ['skip', 'take']);
 
@@ -31,9 +31,14 @@ router
   })
 
   .post('/', adminMidleware, async (req, res) => {
-    const { name, domain } = req.body;
+    let { name, domain } = req.body;
+
+    if (!/\/$/.test(domain)) domain += '/';
+
     const data = { name, domain };
     const project = await db.project.create({ data });
+
+    allowedOrigins.push(domain);
 
     total++;
     res.json({ project, total });
@@ -51,5 +56,3 @@ router
       res.status(404).send('Not found');
     }
   });
-
-export default router;

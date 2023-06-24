@@ -153,7 +153,7 @@
     "eslint-plugin-react": "7.14.3",
     "favicons-webpack-plugin": "^5.0.2",
     "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.3.2",
+    "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.2.2",
     "nodemon": "1.19.1",
     "postcss-loader": "^6.1.1",

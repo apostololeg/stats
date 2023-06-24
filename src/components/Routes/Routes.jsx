@@ -21,7 +21,7 @@ export default withStore({
       />
 
       <Route
-        path="/project/:id"
+        path="/project/:pid"
         component={Lazy}
         loader={() => import('components/Project/Project')}
       />

@@ -1,38 +1,30 @@
-import fs from 'fs';
-import path from 'path';
-import express from 'express';
+import { Router } from 'express';
 
-import { PROTOCOL, DOMAIN, COOKIE_TOKEN_NAME_CLIENT } from '../../config/const';
-
-import { PAGE_SIZE } from '../../src/shared/db';
-import { parseIds } from '../../src/shared/parsers';
-import { generateClientId, getClientToken } from '../tools/tokens';
-
+import { launcher, iframe } from '../client';
 import db from '../api/db';
 
-import { adminMidleware } from './auth';
-import { decodeToken, encodeToken, setCookie } from '../api/auth';
+const client = Router();
 
-let client = fs.readFileSync(path.resolve(__dirname, '../client.js'), 'utf8');
-client = client.replace('{DOMAIN}', `${DOMAIN}/api`); //.replaceAll(/ |\n/g, '');
+export const allowedOrigins = [];
 
-const router = express.Router();
-
-router.get('/:projectId', async (req, res) => {
-  const { projectId } = req.params;
-
-  if (!projectId) return res.json(null);
-
-  // check if project exists
-  const project = await db.project.findUnique({ where: { id: projectId } });
-  if (!project) return res.json(null);
-
-  if (!decodeToken(getClientToken(req))) {
-    const token = encodeToken({ cid: generateClientId(), projectId });
-    setCookie(res, COOKIE_TOKEN_NAME_CLIENT, token);
-  }
-
-  return res.type('.js').send(client);
+db.project.findMany().then(projects => {
+  allowedOrigins.push(...projects.map(p => p.domain));
+  console.log('===allowedOrigins', allowedOrigins);
 });
 
-export default router;
+const allowedOriginsMiddleware = (req, res, next) => {
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins.includes(origin)) {
+    next();
+  } else {
+    res.status(403).send('Not allowed!');
+  }
+};
+
+export default client
+  .get('/', allowedOriginsMiddleware, (req, res) =>
+    res.type('js').send(launcher)
+  )
+  .get('/iframe', allowedOriginsMiddleware, (req, res) =>
+    res.type('html').send(iframe)
+  );

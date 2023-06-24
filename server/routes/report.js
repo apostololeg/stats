@@ -1,10 +1,10 @@
 import express from 'express';
 
 import db from '../api/db';
-import { decodeToken } from '../api/auth';
+import { encodeToken, decodeToken, setCookie } from '../api/auth';
 
 import throttle from '../tools/throttle';
-import { getClientToken } from '../tools/tokens';
+import { getClientToken, generateClientId } from '../tools/tokens';
 import { timezoneCity2Country } from '../tools/timezoneCity2Country';
 
 // import { adminMidleware } from './auth';
@@ -13,16 +13,16 @@ const router = express.Router();
 
 const setProjectUpdated = throttle(
   id => db.project.update({ where: { id }, data: { updatedAt: new Date() } }),
-  1000 * 10 // 10 seconds
+  1000 * 60 // 1 min
 );
 
-router
+export default router
   .get('/', async (req, res) => {
-    const { startDate, endDate, projectId } = req.query;
+    const { startDate, endDate, pid } = req.query;
 
     const events = await db.event.findMany({
       where: {
-        projectId,
+        pid,
         time: {
           gte: new Date(startDate),
           lte: new Date(endDate),
@@ -71,12 +71,24 @@ router
 
   .post('/', async (req, res) => {
     const data = req.body;
-    const { cid, projectId } = decodeToken(getClientToken(req)) ?? {};
-    
-    console.log('----report', data, cid, projectId)  
-    
-    if (!cid || !projectId || !data.page)
-      return res.status(400).send({ ok: false });
+
+    let { cid } = decodeToken(getClientToken(req)) ?? {};
+    let pid = data.pid;
+
+    // first report
+    if (!cid && pid) {
+      // check if project exists
+      const count = await db.project.count({ where: { id: pid } });
+      if (!count) return res.json(null);
+
+      // generate cid
+      cid = generateClientId();
+      setCookie(res, COOKIE_TOKEN_NAME_CLIENT, encodeToken({ cid }));
+    }
+
+    console.log('----report', data, cid);
+
+    if (!cid || !pid || !data.page) return res.status(400).send({ ok: false });
 
     if (data.timeZone) {
       const country = timezoneCity2Country(data.timeZone);
@@ -90,7 +102,7 @@ router
     await db.event.create({
       data: {
         cid,
-        project: { connect: { id: projectId } },
+        project: { connect: { id: pid } },
         data,
       },
     });
@@ -99,5 +111,3 @@ router
 
     res.status(200).send({ ok: true });
   });
-
-export default router;

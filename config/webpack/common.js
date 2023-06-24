@@ -13,10 +13,7 @@ const {
   PROTOCOL,
   HOST,
   SENTRY_DSN,
-  STATS_PROJECT_KEY,
   MAPBOX_ACCESS_TOKEN,
-  UPLOADS_DIR,
-  UPLOADS_DOMAIN,
 } = require('../const');
 
 module.exports = {
@@ -131,8 +128,6 @@ module.exports = {
       HOST: JSON.stringify(HOST),
       SENTRY_DSN: JSON.stringify(SENTRY_DSN),
       MAPBOX_ACCESS_TOKEN: JSON.stringify(MAPBOX_ACCESS_TOKEN),
-      UPLOADS_DIR: JSON.stringify(UPLOADS_DIR),
-      UPLOADS_DOMAIN: JSON.stringify(UPLOADS_DOMAIN),
     }),
     new webpack.ProvidePlugin({
       React: 'react',
@@ -157,7 +152,6 @@ module.exports = {
       title: 'Stats',
       filename: 'index.html',
       template: `${paths.assets}/index.html`,
-      STATS_PROJECT_KEY,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
