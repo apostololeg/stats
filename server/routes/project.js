@@ -1,9 +1,8 @@
 import express from 'express';
 
+import db from '../api/db';
 import { PAGE_SIZE } from '../../src/shared/db';
 import { parseIds } from '../../src/shared/parsers';
-
-import db from '../api/db';
 
 import { adminMidleware } from './auth';
 

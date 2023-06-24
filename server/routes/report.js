@@ -72,26 +72,23 @@ router
   .post('/', async (req, res) => {
     const data = req.body;
 
-    let { cid, projectId } = decodeToken(getClientToken(req)) ?? {};
+    let { cid } = decodeToken(getClientToken(req)) ?? {};
+    let pid = data.pid;
 
     // first report
-    if (!cid && !projectId && data.projectId) {
-      projectId = data.projectId;
-
+    if (!cid && pid) {
       // check if project exists
-      const count = await db.project.count({ where: { id: projectId } });
+      const count = await db.project.count({ where: { id: pid } });
       if (!count) return res.json(null);
 
       // generate cid
       cid = generateClientId();
-      const token = encodeToken({ cid, projectId });
-      setCookie(res, COOKIE_TOKEN_NAME_CLIENT, token);
+      setCookie(res, COOKIE_TOKEN_NAME_CLIENT, encodeToken({ cid }));
     }
 
-    console.log('----report', data, cid, projectId);
+    console.log('----report', data, cid, pid);
 
-    if (!cid || !projectId || !data.page)
-      return res.status(400).send({ ok: false });
+    if (!cid || !pid || !data.page) return res.status(400).send({ ok: false });
 
     if (data.timeZone) {
       const country = timezoneCity2Country(data.timeZone);
@@ -105,7 +102,7 @@ router
     await db.event.create({
       data: {
         cid,
-        project: { connect: { id: projectId } },
+        project: { connect: { id: pid } },
         data,
       },
     });
