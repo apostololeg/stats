@@ -1,7 +1,7 @@
 import express from 'express';
 
 import db from '../api/db';
-import { decodeToken } from '../api/auth';
+import { decodeToken, setCookie } from '../api/auth';
 
 import throttle from '../tools/throttle';
 import { getClientToken } from '../tools/tokens';
@@ -71,10 +71,25 @@ router
 
   .post('/', async (req, res) => {
     const data = req.body;
-    const { cid, projectId } = decodeToken(getClientToken(req)) ?? {};
-    
-    console.log('----report', data, cid, projectId)  
-    
+
+    let { cid, projectId } = decodeToken(getClientToken(req)) ?? {};
+
+    // first report
+    if (!cid && !projectId && data.projectId) {
+      projectId = data.projectId;
+
+      // check if project exists
+      const count = await db.project.count({ where: { id: projectId } });
+      if (!count) return res.json(null);
+
+      // generate cid
+      cid = generateClientId();
+      const token = encodeToken({ cid, projectId });
+      setCookie(res, COOKIE_TOKEN_NAME_CLIENT, token);
+    }
+
+    console.log('----report', data, cid, projectId);
+
     if (!cid || !projectId || !data.page)
       return res.status(400).send({ ok: false });
 
