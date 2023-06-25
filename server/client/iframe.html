@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <script>
+      const report = async data => {
+        fetch('{DOMAIN}/api/report', {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json' },
+        });
+      };
+
+      window.addEventListener('message', event => {
+        const { type, data } = event.data;
+
+        console.log('iframe message', type, data);
+        if (type === 'stats') report(data);
+      });
+    </script>
+  </body>
+</html>

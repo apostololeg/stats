@@ -12,12 +12,9 @@
   }
 
   const report = async data => {
-    fetch('{DOMAIN}/api/report', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' },
-    });
+    window.postMessage({ type: 'stats', pid, ...data });
   };
+
   const reportPage = async e => {
     const { pathname } = e.target.location;
     if (pathname === page) return;
@@ -27,8 +24,17 @@
 
   const { timeZone } = Intl?.DateTimeFormat().resolvedOptions() ?? {};
 
-  report({ pid, page, timeZone });
+  const iframe = document.createElement('iframe');
 
-  document.addEventListener('pushstate', reportPage, true);
-  document.addEventListener('popstate', reportPage, true);
+  iframe.src = '{DOMAIN}/api/client/iframe';
+  iframe.style.display = 'none';
+  iframe.onload = () => {
+    setTimeout(() => {
+      report({ page, timeZone });
+      document.addEventListener('pushstate', reportPage, true);
+      document.addEventListener('popstate', reportPage, true);
+    }, 100);
+  };
+
+  document.body.appendChild(iframe);
 })();

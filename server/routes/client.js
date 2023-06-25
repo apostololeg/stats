@@ -1,13 +1,9 @@
-import fs from 'fs';
-import path from 'path';
 import { Router } from 'express';
 
-import { DOMAIN } from '../../config/const';
-
-const clientScript = fs
-  .readFileSync(path.resolve(__dirname, '../client.js'), 'utf8')
-  .replaceAll('{DOMAIN}', DOMAIN); //.replaceAll(/ |\n/g, '');
+import { laucher, iframe } from '../client';
 
 const client = Router();
 
-export default client.get('/', (req, res) => res.type('js').send(clientScript));
+export default client
+  .get('/', (req, res) => res.type('js').send(laucher))
+  .get('/iframe', (req, res) => res.type('html').send(iframe));

@@ -13,7 +13,7 @@ const router = express.Router();
 
 const setProjectUpdated = throttle(
   id => db.project.update({ where: { id }, data: { updatedAt: new Date() } }),
-  1000 * 10 // 10 seconds
+  1000 * 60 // 1 min
 );
 
 export default router
