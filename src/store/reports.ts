@@ -8,7 +8,7 @@ export const buildInterval = (startDate: string, endDate: string) =>
   `${startDate}-${endDate}`;
 
 export type RequestParams = {
-  projectId: string;
+  pid: string;
   startDate: string;
   endDate: string;
 };
@@ -16,7 +16,7 @@ export type RequestParams = {
 export type Report = {
   startDate: string;
   endDate: string;
-  projectId: string;
+  pid: string;
   countries: { [country: string]: number };
   pages: { [page: string]: number };
 };
@@ -25,15 +25,15 @@ const STORE = createStore('reports', {
   items: {} as { [interval: string]: Report },
 
   async load(data: RequestParams) {
-    const { projectId } = data;
+    const { pid } = data;
     const res = await api.get('/report', { data });
     const { startDate, endDate } = data;
     const interval = buildInterval(startDate, endDate);
 
-    if (!this.items[projectId]) this.items[projectId] = {};
-    if (!this.items[projectId][interval]) this.items[projectId][interval] = {};
+    if (!this.items[pid]) this.items[pid] = {};
+    if (!this.items[pid][interval]) this.items[pid][interval] = {};
 
-    this.items[projectId][interval] = res.report;
+    this.items[pid][interval] = res.report;
   },
 });
 

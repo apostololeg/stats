@@ -11,14 +11,14 @@ const todayEnd = new Date().setHours(23, 59, 59, 999);
 export default withStore({
   projects: ['items'],
   reports: ['items'],
-})(function Project({ pathParams: { id }, store: { projects, reports } }) {
+})(function Project({ pathParams: { pid }, store: { projects, reports } }) {
   const [[startDate, endDate], setDates] = useState([
     today - 1000 * 60 * 60 * 24 * 7, // 7 days
     todayEnd,
   ]);
 
-  const data = projects.items.find(project => project.id === id);
-  const projectReport = reports.items[id];
+  const data = projects.items.find(project => project.id === pid);
+  const projectReport = reports.items[pid];
   const startDateISO = new Date(startDate).toISOString();
   const endDateISO = new Date(endDate).toISOString();
   const interval = buildInterval(startDateISO, endDateISO);
@@ -29,7 +29,7 @@ export default withStore({
   useEffect(() => {
     if (!report) {
       reports.load({
-        projectId: id,
+        pid,
         startDate: startDateISO,
         endDate: endDateISO,
       });

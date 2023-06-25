@@ -18,11 +18,11 @@ const setProjectUpdated = throttle(
 
 router
   .get('/', async (req, res) => {
-    const { startDate, endDate, projectId } = req.query;
+    const { startDate, endDate, pid } = req.query;
 
     const events = await db.event.findMany({
       where: {
-        projectId,
+        pid,
         time: {
           gte: new Date(startDate),
           lte: new Date(endDate),
