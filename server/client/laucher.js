@@ -11,8 +11,13 @@
     return;
   }
 
+  const iframe = document.createElement('iframe');
+
   const report = async data => {
-    window.postMessage({ type: 'stats', pid, ...data });
+    iframe.contentWindow.postMessage(
+      { type: 'stats', pid, ...data },
+      '{DOMAIN}'
+    );
   };
 
   const reportPage = async e => {
@@ -24,17 +29,15 @@
 
   const { timeZone } = Intl?.DateTimeFormat().resolvedOptions() ?? {};
 
-  const iframe = document.createElement('iframe');
-
   iframe.src = '{DOMAIN}/api/client/iframe';
   iframe.style.display = 'none';
-  iframe.onload = () => {
-    setTimeout(() => {
+  document.body.appendChild(iframe);
+
+  window.addEventListener('message', e => {
+    if (e.data.type === 'stats-inited') {
       report({ page, timeZone });
       document.addEventListener('pushstate', reportPage, true);
       document.addEventListener('popstate', reportPage, true);
-    }, 100);
-  };
-
-  document.body.appendChild(iframe);
+    }
+  });
 })();

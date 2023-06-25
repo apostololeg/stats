@@ -14,11 +14,11 @@
       };
 
       window.addEventListener('message', event => {
-        const { type, data } = event.data;
-
-        console.log('iframe message', type, data);
+        const { type, ...data } = event.data;
         if (type === 'stats') report(data);
       });
+
+      window.parent.postMessage({ type: 'stats-inited' }, '*');
     </script>
   </body>
 </html>
