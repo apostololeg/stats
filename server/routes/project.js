@@ -12,7 +12,7 @@ let total = 0;
 
 db.project.count().then(n => (total = n));
 
-router
+export default router
   .get('/', async (req, res) => {
     const params = parseIds(req.query, ['skip', 'take']);
 
@@ -50,5 +50,3 @@ router
       res.status(404).send('Not found');
     }
   });
-
-export default router;

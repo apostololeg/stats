@@ -11,7 +11,7 @@ export const adminMidleware = (req, res, next) => {
   next();
 };
 
-router.get('/:key', (req, res) => {
+export default router.get('/:key', (req, res) => {
   const { key } = req.params;
 
   if (key !== process.env.ADMIN_KEY) {
@@ -26,5 +26,3 @@ router.get('/:key', (req, res) => {
 
   res.redirect('/');
 });
-
-export default router;

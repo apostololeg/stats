@@ -1,10 +1,10 @@
 import express from 'express';
 
 import db from '../api/db';
-import { decodeToken, setCookie } from '../api/auth';
+import { encodeToken, decodeToken, setCookie } from '../api/auth';
 
 import throttle from '../tools/throttle';
-import { getClientToken } from '../tools/tokens';
+import { getClientToken, generateClientId } from '../tools/tokens';
 import { timezoneCity2Country } from '../tools/timezoneCity2Country';
 
 // import { adminMidleware } from './auth';
@@ -16,7 +16,7 @@ const setProjectUpdated = throttle(
   1000 * 10 // 10 seconds
 );
 
-router
+export default router
   .get('/', async (req, res) => {
     const { startDate, endDate, pid } = req.query;
 
@@ -111,5 +111,3 @@ router
 
     res.status(200).send({ ok: true });
   });
-
-export default router;

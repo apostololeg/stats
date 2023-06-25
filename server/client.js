@@ -12,7 +12,7 @@
   }
 
   const report = async data => {
-    fetch('/api/report', {
+    fetch('{DOMAIN}/api/report', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' },
