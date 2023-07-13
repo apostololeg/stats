@@ -36,8 +36,28 @@
   window.addEventListener('message', e => {
     if (e.data.type === 'stats-inited') {
       report({ page, timeZone });
-      document.addEventListener('pushstate', reportPage, true);
-      document.addEventListener('popstate', reportPage, true);
+      const pushState = window.history.pushState;
+      const replaceState = window.history.replaceState;
+
+      history.pushState = function (state) {
+        const pushEvent = new CustomEvent('pushstate', {
+          detail: { state },
+        });
+        window.dispatchEvent(pushEvent);
+        return pushState.apply(history, arguments);
+      };
+
+      history.replaceState = function (state) {
+        const replaceEvent = new CustomEvent('replacestate', {
+          detail: { state },
+        });
+        window.dispatchEvent(replaceEvent);
+        return replaceState.apply(history, arguments);
+      };
+
+      window.addEventListener('pushstate', reportPage);
+      window.addEventListener('replacestate', reportPage);
+      window.addEventListener('popstate', reportPage);
     }
   });
 })();
