@@ -44,21 +44,31 @@ export default withStore({
       {report && (
         <>
           <h2>Countries</h2>
-          <p>
-            {Object.entries(report.countries).map(
-              ([country, count]) => `${country}: ${count}\n`
-            )}
-          </p>
+          <table>
+            <tbody>
+              {Object.entries(report.countries).map(([country, count]) => (
+                <tr key={country}>
+                  <td>{count as number}</td>
+                  <td>{country}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           <h2>Users</h2>
           <p>{report.users}</p>
 
           <h2>Pages</h2>
-          <p>
-            {Object.entries(report.pages).map(
-              ([page, count]) => `${page}: ${count};\n`
-            )}
-          </p>
+          <table>
+            <tbody>
+              {Object.entries(report.pages).map(([page, count]) => (
+                <tr key={page}>
+                  <td>{count as number}</td>
+                  <td>{page}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </>
       )}
     </Container>
