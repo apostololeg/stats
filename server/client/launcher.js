@@ -21,9 +21,9 @@
   };
 
   const reportPage = async e => {
-    const { pathname } = e.target.location;
-    if (pathname === page) return;
-    page = pathname;
+    const { url } = e.detail;
+    if (url === page) return;
+    page = url;
     report({ page });
   };
 
@@ -39,17 +39,17 @@
       const pushState = window.history.pushState;
       const replaceState = window.history.replaceState;
 
-      history.pushState = function (state) {
-        const pushEvent = new CustomEvent('pushstate', {
-          detail: { state },
+      history.pushState = function (state, title, url) {
+        var pushEvent = new CustomEvent('pushstate', {
+          detail: { state, url },
         });
         window.dispatchEvent(pushEvent);
         return pushState.apply(history, arguments);
       };
 
-      history.replaceState = function (state) {
-        const replaceEvent = new CustomEvent('replacestate', {
-          detail: { state },
+      history.replaceState = function (state, title, url) {
+        var replaceEvent = new CustomEvent('replacestate', {
+          detail: { state, url },
         });
         window.dispatchEvent(replaceEvent);
         return replaceState.apply(history, arguments);
