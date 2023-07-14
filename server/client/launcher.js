@@ -21,7 +21,9 @@
   };
 
   const reportPage = async e => {
-    const { url } = e.detail;
+    let url = e.detail.url;
+
+    if (url === '') url = '/';
     if (url === page) return;
     page = url;
     report({ page });
