@@ -21,7 +21,7 @@
   };
 
   const reportPage = async e => {
-    let url = e.detail.url;
+    let url = e.detail.url.split('?')[0];
 
     if (url === '') url = '/';
     if (url === page) return;
