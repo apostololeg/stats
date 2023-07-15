@@ -57,9 +57,12 @@
         return replaceState.apply(history, arguments);
       };
 
+      const onPopState = () =>
+        reportPage({ detail: { url: window.location.pathname } });
+
       window.addEventListener('pushstate', reportPage);
       window.addEventListener('replacestate', reportPage);
-      window.addEventListener('popstate', reportPage);
+      window.addEventListener('popstate', onPopState);
     }
   });
 })();
