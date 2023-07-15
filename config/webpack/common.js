@@ -29,7 +29,6 @@ module.exports = {
     alias: {
       config: paths.config,
       theme: `${paths.client}/theme.styl`,
-      uilib: '@foreverido/uilib',
     },
     // plugins: [new ComponentDirectoryPlugin()],
     extensions: ['.js', '.jsx', '.ts', '.tsx'],

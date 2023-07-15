@@ -1,5 +1,7 @@
 import express from 'express';
 
+import { COOKIE_TOKEN_NAME_CLIENT } from '../../config/const';
+
 import db from '../api/db';
 import { encodeToken, decodeToken, setCookie } from '../api/auth';
 
