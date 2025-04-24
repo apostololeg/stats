@@ -5,10 +5,10 @@ import db from '../api/db';
 
 const client = Router();
 
-export const allowedOrigins = [];
+export let allowedOrigins = [];
 
 db.project.findMany().then(projects => {
-  allowedOrigins.push(...projects.map(p => p.domain));
+  allowedOrigins = [...projects.map(p => p.domain)];
   console.log('===allowedOrigins', allowedOrigins);
 });
 

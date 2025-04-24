@@ -19,58 +19,6 @@ const setProjectUpdated = throttle(
 );
 
 export default router
-  .get('/', async (req, res) => {
-    const { startDate, endDate, pid } = req.query;
-
-    const events = await db.event.findMany({
-      where: {
-        pid,
-        time: {
-          gte: new Date(startDate),
-          lte: new Date(endDate),
-        },
-      },
-      select: {
-        cid: true,
-        data: true,
-      },
-    });
-
-    const report = events.reduce(
-      (acc, { cid, data }) => {
-        const { page, country } = data;
-
-        acc.users.add(cid);
-
-        if (page) acc.pages[page] = (acc.pages[page] ?? 0) + 1;
-
-        if (country) {
-          if (!acc.countries[country]) acc.countries[country] = new Set();
-          acc.countries[country].add(cid);
-        }
-
-        return acc;
-      },
-      {
-        pages: {}, // [page]: count
-        countries: {}, // [country]: {cid, cid, cid}
-        users: new Set(), // [cid]: count
-      }
-    );
-
-    report.users = report.users.size;
-
-    report.countries = Object.entries(report.countries).reduce(
-      (acc, [country, users]) => ({
-        ...acc,
-        [country]: users.size,
-      }),
-      {}
-    );
-
-    res.json({ report });
-  })
-
   .post('/', async (req, res) => {
     const data = req.body;
 
@@ -90,7 +38,8 @@ export default router
 
     console.log('----report', data, cid);
 
-    if (!cid || !pid || !data.page) return res.status(400).send({ ok: false });
+    if (!cid || !pid || (!data.page && !data.event))
+      return res.status(400).send({ ok: false });
 
     if (data.timeZone) {
       const country = timezoneCity2Country(data.timeZone);
@@ -112,4 +61,58 @@ export default router
     setProjectUpdated();
 
     res.status(200).send({ ok: true });
+  })
+
+  .get('/', async (req, res) => {
+    const { startDate, endDate, pid } = req.query;
+
+    const events = await db.event.findMany({
+      where: {
+        pid,
+        time: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      },
+      select: {
+        cid: true,
+        data: true,
+      },
+    });
+
+    const report = events.reduce(
+      (acc, { cid, data }) => {
+        const { page, country, event } = data;
+
+        acc.users.add(cid);
+
+        if (page) acc.pages[page] = (acc.pages[page] ?? 0) + 1;
+        if (event) acc.events[event] = (acc.events[event] ?? 0) + 1;
+
+        if (country) {
+          if (!acc.countries[country]) acc.countries[country] = new Set();
+          acc.countries[country].add(cid);
+        }
+
+        return acc;
+      },
+      {
+        pages: {}, // [page]: count
+        countries: {}, // [country]: {cid, cid, cid}
+        users: new Set(), // [cid]: count
+        events: {}, // [event]: count
+      }
+    );
+
+    report.users = report.users.size;
+
+    report.countries = Object.entries(report.countries).reduce(
+      (acc, [country, users]) => ({
+        ...acc,
+        [country]: users.size,
+      }),
+      {}
+    );
+
+    res.json({ report });
   });

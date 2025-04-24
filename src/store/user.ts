@@ -8,7 +8,7 @@ const STORE = createStore('user', {
   isLoginProgress: false,
   isLogged: !!LS.get('isLogged'),
 
-  async login(key) {
+  async login(key, cb?: (isLogged: boolean) => void) {
     try {
       this.isLoginProgress = true;
       await api.get(`/auth/${key}`); // set cookie
@@ -17,6 +17,7 @@ const STORE = createStore('user', {
       LS.set('isLogged', true);
     } finally {
       this.isLoginProgress = false;
+      cb?.(this.isLogged);
     }
   },
 });

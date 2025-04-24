@@ -16,6 +16,7 @@ export default withStore({
   router: [],
 })(function Header({ store: { header, user, router } }: Props) {
   const [showKeyInput, setShowKeyInput] = useState(false);
+  const [key, setKey] = useState('');
 
   const dropAcc = debounce(() => (acc = 0), 500);
 
@@ -29,9 +30,15 @@ export default withStore({
     <div className={S.root} onPointerUp={onPointerUp}>
       {showKeyInput && !user.isLogged && (
         <Input
-          onChange={((e, val) => user.login(val)) as any}
-          value=""
           className={S.keyInput}
+          value={key}
+          onChange={((e, val) => setKey(val)) as any}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              user.login(key);
+              setShowKeyInput(false);
+            }
+          }}
         />
       )}
       <Link href="/" isClear inline className={S.title}>

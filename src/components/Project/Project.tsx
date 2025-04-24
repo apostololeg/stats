@@ -69,6 +69,18 @@ export default withStore({
               ))}
             </tbody>
           </table>
+
+          <h2>Events</h2>
+          <table>
+            <tbody>
+              {Object.entries(report.events).map(([event, count]) => (
+                <tr key={event}>
+                  <td>{count as number}</td>
+                  <td>{event}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </>
       )}
     </Container>

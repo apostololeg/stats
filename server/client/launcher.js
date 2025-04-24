@@ -29,6 +29,11 @@
     report({ page });
   };
 
+  window.statsSDK = {
+    report,
+    reportPage,
+  };
+
   const { timeZone } = Intl?.DateTimeFormat().resolvedOptions() ?? {};
 
   iframe.src = '{DOMAIN}/api/client/iframe';
@@ -63,6 +68,13 @@
       window.addEventListener('pushstate', reportPage);
       window.addEventListener('replacestate', reportPage);
       window.addEventListener('popstate', onPopState);
+
+      return;
     }
+
+    if (e.data.type === 'stats') {
+      report(e.data.event);
+    }
+
   });
 })();
