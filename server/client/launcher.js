@@ -1,5 +1,6 @@
 (() => {
   let page = window.location.pathname;
+  const origin = window.location.origin;
 
   const pid = document
     .querySelector(`[src*="/client?pid="]`)
@@ -18,7 +19,7 @@
 
   const report = async data => {
     iframe.contentWindow.postMessage(
-      { type: 'stats', pid, ...data },
+      { type: 'stats', ...data, pid, origin },
       '{DOMAIN}'
     );
   };

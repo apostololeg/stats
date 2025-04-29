@@ -5,17 +5,20 @@
   </head>
   <body>
     <script>
-      const report = async data => {
+      const report = async (origin, data) => {
         fetch('{DOMAIN}/api/report', {
           method: 'POST',
           body: JSON.stringify(data),
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Origin: origin,
+          },
         });
       };
 
       window.addEventListener('message', event => {
-        const { type, ...data } = event.data;
-        if (type === 'stats') report(data);
+        const { type, origin, ...data } = event.data;
+        if (type === 'stats') report(origin, data);
       });
 
       window.parent.postMessage({ type: 'stats-inited' }, '*');

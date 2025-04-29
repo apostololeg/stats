@@ -5,7 +5,7 @@ import { PAGE_SIZE } from '../../src/shared/db';
 import { parseIds } from '../../src/shared/parsers';
 
 import { adminMidleware } from './auth';
-import { allowedOrigins } from './client';
+import { allowedOrigins } from '../middlewares/allowedOrigins';
 
 const router = express.Router();
 
