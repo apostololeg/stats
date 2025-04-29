@@ -12,6 +12,9 @@
   }
 
   const iframe = document.createElement('iframe');
+  iframe.src = '{DOMAIN}/api/client/iframe';
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
 
   const report = async data => {
     iframe.contentWindow.postMessage(
@@ -29,52 +32,44 @@
     report({ page });
   };
 
-  window.statsSDK = {
-    report,
-    reportPage,
+  const watchBrowserHistory = () => {
+    const pushState = window.history.pushState;
+    const replaceState = window.history.replaceState;
+
+    const createEvent = (type, state, url) =>
+      new CustomEvent(type, { detail: { state, url } });
+
+    history.pushState = function (state, title, url) {
+      window.dispatchEvent(createEvent('pushstate', state, url));
+      return pushState.apply(history, arguments);
+    };
+
+    history.replaceState = function (state, title, url) {
+      window.dispatchEvent(createEvent('replacestate', state, url));
+      return replaceState.apply(history, arguments);
+    };
+
+    const onPopState = () =>
+      reportPage({ detail: { url: window.location.pathname } });
+
+    window.addEventListener('pushstate', reportPage);
+    window.addEventListener('replacestate', reportPage);
+    window.addEventListener('popstate', onPopState);
   };
 
   const { timeZone } = Intl?.DateTimeFormat().resolvedOptions() ?? {};
 
-  iframe.src = '{DOMAIN}/api/client/iframe';
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
-
   window.addEventListener('message', e => {
     if (e.data.type === 'stats-inited') {
       report({ page, timeZone });
-      const pushState = window.history.pushState;
-      const replaceState = window.history.replaceState;
-
-      history.pushState = function (state, title, url) {
-        var pushEvent = new CustomEvent('pushstate', {
-          detail: { state, url },
-        });
-        window.dispatchEvent(pushEvent);
-        return pushState.apply(history, arguments);
-      };
-
-      history.replaceState = function (state, title, url) {
-        var replaceEvent = new CustomEvent('replacestate', {
-          detail: { state, url },
-        });
-        window.dispatchEvent(replaceEvent);
-        return replaceState.apply(history, arguments);
-      };
-
-      const onPopState = () =>
-        reportPage({ detail: { url: window.location.pathname } });
-
-      window.addEventListener('pushstate', reportPage);
-      window.addEventListener('replacestate', reportPage);
-      window.addEventListener('popstate', onPopState);
-
+      watchBrowserHistory();
       return;
     }
-
-    if (e.data.type === 'stats') {
-      report(e.data.event);
-    }
-
   });
+
+  window.statsSDK = {
+    report,
+    reportPage,
+    timeZone,
+  };
 })();

@@ -21,8 +21,8 @@ model Project {
 
 model Event {
   id          String   @id @default(cuid())
-  cid         String
-  pid         String
+  cid         String   // client id
+  pid         String   // project id
   project     Project  @relation(fields: [pid], references: [id])
   time        DateTime @default(now())
   data        Json
