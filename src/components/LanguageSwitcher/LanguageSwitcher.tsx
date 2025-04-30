@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { withStore } from 'justorm/react';
-import { Select } from '@homecode/ui';
+import { useStore } from 'justorm/react';
+import { Select, i18n as i18nService } from '@homecode/ui';
 
 import moment from 'moment';
 // @ts-ignore
@@ -22,10 +22,15 @@ export default function LanguageSwitcher(props) {
   );
 }
 
-export const UILanguageSwitcher = withStore({
-  i18n: 'lang',
-})(function UILanguageSwitcher({ store, ...rest }) {
-  const { lang } = store.i18n;
+type Store = {
+  i18n: typeof i18nService.store;
+};
+
+export const UILanguageSwitcher = function UILanguageSwitcher({ ...rest }) {
+  const { i18n: i18nStore } = useStore<Store>({
+    i18n: ['lang'],
+  });
+  const { lang } = i18nStore;
 
   useEffect(() => {
     moment.locale(lang === 'ua' ? 'uk' : lang, [ruLocale, uaLocale]);
@@ -36,7 +41,7 @@ export const UILanguageSwitcher = withStore({
       label={i18n('Language')}
       {...rest}
       value={lang}
-      onChange={store.i18n.changeLang}
+      onChange={i18nStore.changeLang}
     />
   );
-});
+};

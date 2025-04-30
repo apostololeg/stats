@@ -1,13 +1,14 @@
-import { withStore } from 'justorm/react';
+import { useStore } from 'justorm/react';
 
 import { Router, Route, Redirect, Lazy } from '@homecode/ui';
 
 import NoMatch from './NoMatch';
 
-export default withStore({
-  user: ['id', 'isInited', 'isLogged', 'permissions'],
-})(function Routes({ store }) {
-  const { isInited, isLogged, permissions } = store.user;
+export default function Routes() {
+  // const { user } = useStore({
+  //   user: ['id', 'isInited', 'isLogged', 'permissions'],
+  // });
+  // const { isInited, isLogged, permissions } = user;
 
   // if (!isInited) return <PageLoader size="l" />;
 
@@ -29,4 +30,4 @@ export default withStore({
       <Route component={NoMatch} />
     </Router>
   );
-});
+}

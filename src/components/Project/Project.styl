@@ -1,5 +1,9 @@
 .root h1
   padding-top 0
+  display flex
+  align-items center
+  justify-content space-between
+  flex-wrap wrap
 
 .root table
   border-radius 14px
@@ -13,3 +17,14 @@
   &:first-child
     text-align right
     width 60px
+
+.root tfoot tr
+  font-weight bold
+  background-color var(--accent-color-alpha-100)
+
+.datePicker
+  max-width 300px
+  min-width 300px
+
+.gap
+  flex-grow 1

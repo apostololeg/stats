@@ -1,5 +1,3 @@
-import { withStore } from 'justorm/react';
-
 import { Icon } from '@homecode/ui';
 
 import { Container } from 'components/UI/Container/Container';

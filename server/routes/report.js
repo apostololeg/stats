@@ -23,7 +23,7 @@ export default router
     const data = req.body;
 
     let { cid } = decodeToken(getClientToken(req)) ?? {};
-    let pid = data.pid;
+    const pid = data.pid;
 
     // first report
     if (!cid && pid) {
@@ -41,13 +41,11 @@ export default router
     if (!cid || !pid || (!data.page && !data.event))
       return res.status(400).send({ ok: false });
 
-    if (data.timeZone) {
-      const country = timezoneCity2Country(data.timeZone);
+    const country = timezoneCity2Country(data.timeZone ?? '');
 
-      if (country) {
-        data.country = country;
-        delete data.timeZone;
-      }
+    if (country) {
+      data.country = country;
+      delete data.timeZone;
     }
 
     await db.event.create({

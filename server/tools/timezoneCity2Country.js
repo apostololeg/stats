@@ -1,5 +1,7 @@
 export function timezoneCity2Country(timeZone) {
-  const city = timeZone.split('/')[1];
+  if (!timeZone) return null;
+
+  const city = timeZone.split('/').slice(-1)[0];
   const country = Object.entries(MAP).find(([country, cities]) =>
     cities.includes(city)
   )?.[0];

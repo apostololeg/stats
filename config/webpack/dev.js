@@ -13,7 +13,7 @@ const proxyConfig = {
   secure: false,
   changeOrigin: true,
   logLevel: 'debug',
-  target: `${PROTOCOL}${HOST}:${SERVER_PORT}/`,
+  target: `${PROTOCOL}${HOST}/`,
 };
 
 const plugins = [

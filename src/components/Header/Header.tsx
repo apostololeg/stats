@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useState } from 'react';
-import { withStore } from 'justorm/react';
+import { useStore } from 'justorm/react';
 import { Input, Link, debounce } from '@homecode/ui';
 
 import S from './Header.styl';
@@ -11,10 +11,11 @@ type Props = {
 
 let acc = 0;
 
-export default withStore({
-  user: ['isLogged'],
-  router: [],
-})(function Header({ store: { header, user, router } }: Props) {
+export default function Header() {
+  const { user } = useStore({
+    user: ['isLogged'],
+  });
+
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [key, setKey] = useState('');
 
@@ -33,11 +34,14 @@ export default withStore({
           className={S.keyInput}
           value={key}
           onChange={((e, val) => setKey(val)) as any}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              user.login(key);
-              setShowKeyInput(false);
-            }
+          controlProps={{
+            onKeyDown: e => {
+              console.log('onKeyDown', e.key);
+              if (e.key === 'Enter') {
+                user.login(key);
+                setShowKeyInput(false);
+              }
+            },
           }}
         />
       )}
@@ -47,4 +51,4 @@ export default withStore({
       </Link>
     </div>
   );
-});
+}

@@ -1,32 +1,43 @@
-import { withStore } from 'justorm/react';
+import { useStore } from 'justorm/react';
 import { useEffect, useState } from 'react';
 import { buildInterval } from 'store/reports';
 
+import { DatePickerInput } from '@homecode/ui';
 import S from './Project.styl';
 import { Container } from 'components/UI/Container/Container';
 
 const today = new Date().setHours(0, 0, 0, 0);
 const todayEnd = new Date().setHours(23, 59, 59, 999);
+const week = 1000 * 60 * 60 * 24 * 7;
 
-export default withStore({
-  projects: ['items'],
-  reports: ['items'],
-})(function Project({ pathParams: { pid }, store: { projects, reports } }) {
-  const [[startDate, endDate], setDates] = useState([
-    today - 1000 * 60 * 60 * 24 * 7, // 7 days
-    todayEnd,
+const startDate = new Date(today - week);
+const endDate = new Date(todayEnd);
+
+export default function Project({ pathParams: { pid } }) {
+  const { projects, reports } = useStore({
+    projects: ['items'],
+    reports: ['items'],
+  });
+  const [value, setValue] = useState([
+    startDate.toLocaleDateString('sv-SE'),
+    endDate.toLocaleDateString('sv-SE'),
   ]);
 
   const data = projects.items.find(project => project.id === pid);
   const projectReport = reports.items[pid];
-  const startDateISO = new Date(startDate).toISOString();
-  const endDateISO = new Date(endDate).toISOString();
+  const startDateISO = startDate.toISOString();
+  const endDateISO = endDate.toISOString();
   const interval = buildInterval(startDateISO, endDateISO);
   const report = projectReport?.[interval];
-
+  const eventsEntries = Object.entries(report?.events ?? {});
+  const pagesEntries = Object.entries(report?.pages ?? {});
   console.log('interval', interval);
 
   useEffect(() => {
+    if (!data) {
+      projects.load(pid);
+    }
+
     if (!report) {
       reports.load({
         pid,
@@ -34,16 +45,30 @@ export default withStore({
         endDate: endDateISO,
       });
     }
-  }, [data, report]);
-
-  if (!data) return null;
+  }, [pid]);
 
   return (
     <Container className={S.root}>
-      <h1>{data.name}</h1>
+      <h1>
+        {data?.name}
+        <div className={S.gap} />
+        <DatePickerInput
+          size="s"
+          value={value}
+          onChange={setValue}
+          buttonProps={{ round: true }}
+          popupProps={{
+            blur: true,
+            elevation: 1,
+            contentProps: { className: S.datePicker },
+          }}
+        />
+      </h1>
+
       {report && (
         <>
-          <h2>Countries</h2>
+          <h2>Users by country</h2>
+
           <table>
             <tbody>
               {Object.entries(report.countries).map(([country, count]) => (
@@ -53,36 +78,61 @@ export default withStore({
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr>
+                <td>{report.users}</td>
+                <td>Total</td>
+              </tr>
+            </tfoot>
           </table>
-
-          <h2>Users</h2>
-          <p>{report.users}</p>
 
           <h2>Pages</h2>
-          <table>
-            <tbody>
-              {Object.entries(report.pages).map(([page, count]) => (
-                <tr key={page}>
-                  <td>{count as number}</td>
-                  <td>{page}</td>
+          {pagesEntries.length > 0 ? (
+            <table>
+              <tbody>
+                {pagesEntries.map(([page, count]) => (
+                  <tr key={page}>
+                    <td>{count as number}</td>
+                    <td>{page}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>{pagesEntries.length}</td>
+                  <td>Total</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </tfoot>
+            </table>
+          ) : (
+            'No Pages'
+          )}
 
           <h2>Events</h2>
-          <table>
-            <tbody>
-              {Object.entries(report.events).map(([event, count]) => (
-                <tr key={event}>
-                  <td>{count as number}</td>
-                  <td>{event}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {eventsEntries.length > 0 ? (
+            <table>
+              <tbody>
+                {eventsEntries.map(([event, count]) => (
+                  <tr key={event}>
+                    <td>{count as number}</td>
+                    <td>{event}</td>
+                  </tr>
+                ))}
+              </tbody>
+              {eventsEntries.length > 1 && (
+                <tfoot>
+                  <tr>
+                    <td>{eventsEntries.length}</td>
+                    <td>Total</td>
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          ) : (
+            'No Events'
+          )}
         </>
       )}
     </Container>
   );
-});
+}
