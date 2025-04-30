@@ -1,19 +1,10 @@
-import { Component } from 'react';
 import { useStore } from 'justorm/react';
-import {
-  Checkbox,
-  Icon,
-  Notifications,
-  Scroll,
-  Theme,
-  VH,
-  dom,
-} from '@homecode/ui';
+import cn from 'classnames';
+import { Checkbox, Notifications, Scroll, Theme, VH, dom } from '@homecode/ui';
 
 import Routes from 'components/Routes/Routes';
 
 import Header from 'components/Header/Header';
-import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
 import ProjectsList from 'components/ProjectsList/ProjectsList';
 import AddProject from 'components/AddProject/AddProject';
 import S from './App.styl';
@@ -25,7 +16,7 @@ dom.watchControllerFlag();
 
 export default function App() {
   const { app, user } = useStore({
-    app: ['theme'],
+    app: ['theme', 'isSidebarOpen'],
     user: ['isLogged'],
     projects: [],
   });
@@ -35,8 +26,9 @@ export default function App() {
       <VH />
       <Theme config={app.currThemeConfig} />
       <div className={S.root}>
-        <div className={S.sidebar}>
+        <div className={cn(S.sidebar, app.isSidebarOpen && S.isOpen)}>
           <Header />
+
           <Scroll
             y
             offset={{ y: { before: 20, after: 20 } }}
@@ -44,9 +36,16 @@ export default function App() {
             autoHide
             fadeSize="l"
           >
-            <ProjectsList itemProps={{ className: S.listItem, size: 'l' }} />
+            <ProjectsList
+              itemProps={{
+                className: S.listItem,
+                size: 'l',
+                onClick: app.toggleSidebar,
+              }}
+            />
             {user.isLogged && <AddProject />}
           </Scroll>
+
           <div className={S.darkThemeCheckbox}>
             {app.theme === 'dark' ? '🌚' : '🌝'}
             <Checkbox

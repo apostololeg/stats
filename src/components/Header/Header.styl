@@ -1,4 +1,5 @@
 @import '~theme'
+json('../../constants/layoutBreakpoints.json')
 
 .root
   display flex
@@ -39,6 +40,7 @@
   align-items center
   flex-grow 1
   color var(--accent-color) !important
+  background-color transparent !important
 
   svg > path:first-child
     transition fill .2s ease-out
@@ -55,3 +57,24 @@
   &
   & label
     width 100%
+
+@media screen and (max-width: unit(MOBILE, 'px'))
+  .root
+    position fixed
+    left 100%
+    top 0
+
+  .title::before
+    content ''
+    position fixed
+    z-index 1
+    top 0
+    left 100%
+    width 100%
+    height 100%
+    transition background-color .2s ease-out
+    pointer-events none
+
+  .isSidebarOpen .title::before
+    background-color var(--decent-color-alpha-800)
+    pointer-events auto

@@ -1,9 +1,11 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useStore } from 'justorm/react';
-import { Input, Link, debounce } from '@homecode/ui';
+import { Button, Input, debounce } from '@homecode/ui';
+import cn from 'classnames';
 
 import S from './Header.styl';
 import Logo from 'components/Logo/Logo';
+import BREAKPOINTS from 'constants/layoutBreakpoints.json';
 
 type Props = {
   store?: any;
@@ -12,8 +14,10 @@ type Props = {
 let acc = 0;
 
 export default function Header() {
-  const { user } = useStore({
+  const { user, router, app } = useStore({
     user: ['isLogged'],
+    router: [],
+    app: ['isSidebarOpen'],
   });
 
   const [showKeyInput, setShowKeyInput] = useState(false);
@@ -27,8 +31,19 @@ export default function Header() {
     dropAcc();
   }, []);
 
+  const handleClick = useCallback(() => {
+    if (window.innerWidth < BREAKPOINTS.MOBILE) {
+      app.toggleSidebar();
+    } else {
+      router.go('/');
+    }
+  }, [user.isLogged]);
+
   return (
-    <div className={S.root} onPointerUp={onPointerUp}>
+    <div
+      className={cn(S.root, app.isSidebarOpen && S.isSidebarOpen)}
+      onPointerUp={onPointerUp}
+    >
       {showKeyInput && !user.isLogged && (
         <Input
           className={S.keyInput}
@@ -45,10 +60,10 @@ export default function Header() {
           }}
         />
       )}
-      <Link href="/" isClear inline className={S.title}>
+      <Button variant="clear" className={S.title} onClick={handleClick}>
         <Logo />
         &nbsp; Stats
-      </Link>
+      </Button>
     </div>
   );
 }

@@ -16,9 +16,9 @@ const endDate = new Date(todayEnd);
 export default function Project({ pathParams: { pid } }) {
   const { projects, reports } = useStore({
     projects: ['items'],
-    reports: ['items'],
+    reports: ['items', 'isLoading'],
   });
-  const [value, setValue] = useState([
+  const [dateInterval, setDateInterval] = useState([
     startDate.toLocaleDateString('sv-SE'),
     endDate.toLocaleDateString('sv-SE'),
   ]);
@@ -27,25 +27,28 @@ export default function Project({ pathParams: { pid } }) {
   const projectReport = reports.items[pid];
   const startDateISO = startDate.toISOString();
   const endDateISO = endDate.toISOString();
-  const interval = buildInterval(startDateISO, endDateISO);
+  const interval = buildInterval(...dateInterval);
   const report = projectReport?.[interval];
   const eventsEntries = Object.entries(report?.events ?? {});
   const pagesEntries = Object.entries(report?.pages ?? {});
-  console.log('interval', interval);
+
+  console.log('dateInterval', dateInterval);
 
   useEffect(() => {
     if (!data) {
       projects.load(pid);
     }
+  }, [pid]);
 
+  useEffect(() => {
     if (!report) {
       reports.load({
         pid,
-        startDate: startDateISO,
-        endDate: endDateISO,
+        startDate: dateInterval[0],
+        endDate: dateInterval[1],
       });
     }
-  }, [pid]);
+  }, [pid, dateInterval]);
 
   return (
     <Container className={S.root}>
@@ -54,8 +57,8 @@ export default function Project({ pathParams: { pid } }) {
         <div className={S.gap} />
         <DatePickerInput
           size="s"
-          value={value}
-          onChange={setValue}
+          value={dateInterval}
+          onChange={setDateInterval}
           buttonProps={{ round: true }}
           popupProps={{
             blur: true,
@@ -86,7 +89,7 @@ export default function Project({ pathParams: { pid } }) {
             </tfoot>
           </table>
 
-          <h2>Pages</h2>
+          <h2>Pages views</h2>
           {pagesEntries.length > 0 ? (
             <table>
               <tbody>

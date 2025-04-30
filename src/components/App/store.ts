@@ -15,6 +15,7 @@ export default createStore('app', {
   update: null,
   theme: initialThemeType,
   currThemeConfig: getThemeConfig(initialThemeType, activeColor),
+  isSidebarOpen: false,
 
   isDarkTheme() {
     return this.theme === 'dark';
@@ -22,6 +23,10 @@ export default createStore('app', {
 
   toggleTheme() {
     this.setTheme(this.isDarkTheme() ? 'light' : 'dark');
+  },
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   },
 
   setTheme(theme) {

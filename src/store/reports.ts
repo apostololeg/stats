@@ -1,8 +1,6 @@
 import { createStore } from 'justorm/react';
-import { NotificationsStore } from '@homecode/ui';
 
 import { api } from 'tools/request';
-import { i18n } from 'tools/i18n';
 
 export const buildInterval = (startDate: string, endDate: string) =>
   `${startDate}-${endDate}`;
@@ -24,7 +22,11 @@ export type Report = {
 const STORE = createStore('reports', {
   items: {} as { [interval: string]: Report },
 
+  isLoading: false,
+
   async load(data: RequestParams) {
+    this.isLoading = true;
+
     const { pid } = data;
     const res = await api.get('/report', { data });
     const { startDate, endDate } = data;
@@ -34,6 +36,7 @@ const STORE = createStore('reports', {
     if (!this.items[pid][interval]) this.items[pid][interval] = {};
 
     this.items[pid][interval] = res.report;
+    this.isLoading = false;
   },
 });
 
