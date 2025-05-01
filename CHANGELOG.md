@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/apostololeg/stat/compare/v1.0.0...v1.1.0) (2025-05-01)
+
+
+### Features
+
+* Ensure origin 🔐 ([05b13b8](https://github.com/apostololeg/stat/commit/05b13b8756c2ee3ae2df2c2ba91abae486c6921e))
+* Report page - date range selector ([b681020](https://github.com/apostololeg/stat/commit/b68102049da8865d9c92c64a1aa9058d09445ce4))
+* Save selected date interval to LS ([b26e147](https://github.com/apostololeg/stat/commit/b26e147bad5cb76faf1cb8e648024cf92e12cac4))
+
 ## 1.0.0 (2025-04-24)
 
 
