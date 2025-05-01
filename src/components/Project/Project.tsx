@@ -24,9 +24,15 @@ export default function Project({ pathParams: { pid } }) {
   });
 
   const [report, setReport] = useState<Report | null>(null);
-  const [dateInterval, setDateInterval] = useState(INITIAL_DATE_INTERVAL);
+  const [dateInterval, _setDateInterval] = useState(INITIAL_DATE_INTERVAL);
   const dateIntervalRef = useRef(dateInterval);
   const intervalStr = buildInterval(dateInterval[0], dateInterval[1]);
+
+  const setDateInterval = (dateInterval: string[]) => {
+    _setDateInterval(dateInterval);
+    dateIntervalRef.current = dateInterval;
+    LS.set('project.dateInterval', dateInterval);
+  };
 
   const isLastWeek =
     dateInterval[0] === lastWeekInterval[0] &&
@@ -40,9 +46,10 @@ export default function Project({ pathParams: { pid } }) {
   const data = projects.items.find(project => project.id === pid);
   const projectReport = reports.items[pid];
   const reportByInterval = getReportByInterval();
-  const eventsEntries = Object.entries(report?.events ?? {});
-  const pagesEntries = Object.entries(report?.pages ?? {});
 
+  const usersByCountryEntries = Object.entries(report?.usersByCountry ?? {});
+  const eventsEntries = Object.entries(report?.events ?? {});
+  const pagesEntries = Object.entries(report?.pagesViews ?? {});
   const isLoading =
     projects.loadingByPid[pid] || reports.isLoadingByInterval[intervalStr];
 
@@ -59,9 +66,6 @@ export default function Project({ pathParams: { pid } }) {
 
   const onDateIntervalChange = (dateInterval: string[]) => {
     setDateInterval(dateInterval);
-    dateIntervalRef.current = dateInterval;
-    LS.set('project.dateInterval', dateInterval);
-
     setReportByInterval();
   };
 
@@ -121,23 +125,26 @@ export default function Project({ pathParams: { pid } }) {
       {report && (
         <>
           <h2>Users by country</h2>
-
-          <table>
-            <tbody>
-              {Object.entries(report.countries).map(([country, count]) => (
-                <tr key={country}>
-                  <td>{count as number}</td>
-                  <td>{country}</td>
+          {usersByCountryEntries.length > 0 ? (
+            <table>
+              <tbody>
+                {usersByCountryEntries.map(([country, count]) => (
+                  <tr key={country}>
+                    <td>{count as number}</td>
+                    <td>{country}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>{report.totalUsersByCountry}</td>
+                  <td>Total</td>
                 </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td>{report.users}</td>
-                <td>Total</td>
-              </tr>
-            </tfoot>
-          </table>
+              </tfoot>
+            </table>
+          ) : (
+            'No Users'
+          )}
 
           <h2>Pages views</h2>
           {pagesEntries.length > 0 ? (
@@ -152,7 +159,7 @@ export default function Project({ pathParams: { pid } }) {
               </tbody>
               <tfoot>
                 <tr>
-                  <td>{pagesEntries.length}</td>
+                  <td>{report.totalPageViews}</td>
                   <td>Total</td>
                 </tr>
               </tfoot>
@@ -172,14 +179,12 @@ export default function Project({ pathParams: { pid } }) {
                   </tr>
                 ))}
               </tbody>
-              {eventsEntries.length > 1 && (
-                <tfoot>
-                  <tr>
-                    <td>{eventsEntries.length}</td>
-                    <td>Total</td>
-                  </tr>
-                </tfoot>
-              )}
+              <tfoot>
+                <tr>
+                  <td>{report.totalEvents}</td>
+                  <td>Total</td>
+                </tr>
+              </tfoot>
             </table>
           ) : (
             'No Events'

@@ -13,13 +13,17 @@ export type RequestParams = {
 };
 
 export type Report = {
+  pid: string;
   startDate: string;
   endDate: string;
-  pid: string;
-  countries: { [country: string]: number };
-  pages: { [page: string]: number };
-  users: { [user: string]: number };
+
+  usersByCountry: { [country: string]: number }; // users by country
+  pagesViews: { [page: string]: number }; // pages views
   events: { [event: string]: number };
+
+  totalUsersByCountry: number;
+  totalPageViews: number;
+  totalEvents: number;
 };
 
 const STORE = createStore('reports', {

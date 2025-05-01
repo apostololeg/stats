@@ -82,33 +82,42 @@ export default router
       (acc, { cid, data }) => {
         const { page, country, event } = data;
 
-        acc.users.add(cid);
+        if (page) {
+          acc.pagesViews[page] = (acc.pagesViews[page] ?? 0) + 1;
+          acc.totalPageViews++;
+        }
 
-        if (page) acc.pages[page] = (acc.pages[page] ?? 0) + 1;
-        if (event) acc.events[event] = (acc.events[event] ?? 0) + 1;
+        if (event) {
+          acc.events[event] = (acc.events[event] ?? 0) + 1;
+          acc.totalEvents++;
+        }
 
         if (country) {
-          if (!acc.countries[country]) acc.countries[country] = new Set();
-          acc.countries[country].add(cid);
+          if (!acc.usersByCountry[country])
+            acc.usersByCountry[country] = new Set();
+          acc.usersByCountry[country].add(cid);
         }
 
         return acc;
       },
       {
-        pages: {}, // [page]: count
-        countries: {}, // [country]: {cid, cid, cid}
-        users: new Set(), // [cid]: count
+        usersByCountry: {}, // [country]: {cid, cid, cid}
+        pagesViews: {}, // [page]: count
         events: {}, // [event]: count
+        totalUsersByCountry: 0,
+        totalPageViews: 0,
+        totalEvents: 0,
       }
     );
 
-    report.users = report.users.size;
-
-    report.countries = Object.entries(report.countries).reduce(
-      (acc, [country, users]) => ({
-        ...acc,
-        [country]: users.size,
-      }),
+    // remove sensitive data, add total
+    report.usersByCountry = Object.entries(report.usersByCountry).reduce(
+      (acc, [country, users]) => {
+        const count = users.size;
+        acc[country] = count;
+        report.totalUsersByCountry += count;
+        return acc;
+      },
       {}
     );
 
