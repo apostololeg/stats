@@ -5,10 +5,20 @@ import { api } from 'tools/request';
 export default createStore('projects', {
   items: [],
 
-  async load() {
+  loadingByPid: {},
+
+  async load(pid: string) {
+    if (this.loadingByPid[pid]) {
+      return;
+    }
+
+    this.loadingByPid[pid] = true;
+
     const res = await api.get('/project');
 
     this.items.push(...res.projects);
+
+    this.loadingByPid[pid] = false;
   },
 
   async add(data) {

@@ -1,45 +1,68 @@
 import { useStore } from 'justorm/react';
-import { useEffect, useState } from 'react';
-import { buildInterval } from 'store/reports';
+import { useEffect, useRef, useState } from 'react';
+import { buildInterval, Report } from 'store/reports';
+import cn from 'classnames';
 
-import { DatePickerInput, LS } from '@homecode/ui';
+import { Button, DatePickerInput, LS, useDebounce } from '@homecode/ui';
 import S from './Project.styl';
 import { Container } from 'components/UI/Container/Container';
 
 const today = new Date().setHours(0, 0, 0, 0);
 const todayEnd = new Date().setHours(23, 59, 59, 999);
 const week = 1000 * 60 * 60 * 24 * 7;
-
-const getInitialDateInterval = () => {
-  const dateInterval = LS.get('project.dateInterval');
-  if (dateInterval) return dateInterval;
-
-  const startDate = new Date(today - week);
-  const endDate = new Date(todayEnd);
-
-  return [
-    startDate.toLocaleDateString('sv-SE'),
-    endDate.toLocaleDateString('sv-SE'),
-  ];
-};
+const lastWeekInterval = [
+  new Date(today - week).toLocaleDateString('sv-SE'),
+  new Date(todayEnd).toLocaleDateString('sv-SE'),
+];
+const INITIAL_DATE_INTERVAL =
+  LS.get('project.dateInterval') || lastWeekInterval;
 
 export default function Project({ pathParams: { pid } }) {
   const { projects, reports } = useStore({
-    projects: ['items'],
-    reports: ['items', 'isLoading'],
+    projects: ['items', 'loadingByPid'],
+    reports: ['items', 'isLoadingByInterval'],
   });
-  const [dateInterval, setDateInterval] = useState(getInitialDateInterval());
+
+  const [report, setReport] = useState<Report | null>(null);
+  const [dateInterval, setDateInterval] = useState(INITIAL_DATE_INTERVAL);
+  const dateIntervalRef = useRef(dateInterval);
+  const intervalStr = buildInterval(dateInterval[0], dateInterval[1]);
+
+  const isLastWeek =
+    dateInterval[0] === lastWeekInterval[0] &&
+    dateInterval[1] === lastWeekInterval[1];
+
+  const getReportByInterval = () => {
+    const interval = buildInterval(dateInterval[0], dateInterval[1]);
+    return projectReport?.[interval];
+  };
 
   const data = projects.items.find(project => project.id === pid);
   const projectReport = reports.items[pid];
-  const interval = buildInterval(dateInterval[0], dateInterval[1]);
-  const report = projectReport?.[interval];
+  const reportByInterval = getReportByInterval();
   const eventsEntries = Object.entries(report?.events ?? {});
   const pagesEntries = Object.entries(report?.pages ?? {});
 
-  const onDateIntervalChange = (dateInterval: [string, string]) => {
+  const isLoading =
+    projects.loadingByPid[pid] || reports.isLoadingByInterval[intervalStr];
+
+  const updateReport = useDebounce(() => {
+    const [startDate, endDate] = dateIntervalRef.current;
+    reports.load({ pid, startDate, endDate });
+  }, 500);
+
+  const setReportByInterval = () => {
+    const report = getReportByInterval();
+    if (report) setReport(report);
+    else updateReport(dateInterval);
+  };
+
+  const onDateIntervalChange = (dateInterval: string[]) => {
     setDateInterval(dateInterval);
+    dateIntervalRef.current = dateInterval;
     LS.set('project.dateInterval', dateInterval);
+
+    setReportByInterval();
   };
 
   useEffect(() => {
@@ -49,31 +72,50 @@ export default function Project({ pathParams: { pid } }) {
   }, [pid]);
 
   useEffect(() => {
-    if (!report) {
-      reports.load({
-        pid,
-        startDate: dateInterval[0],
-        endDate: dateInterval[1],
-      });
-    }
-  }, [pid, dateInterval]);
+    if (!report) updateReport(dateInterval);
+  }, [pid]);
+
+  useEffect(() => {
+    if (reportByInterval) setReport(reportByInterval);
+    else updateReport(dateInterval);
+  }, [reportByInterval]);
 
   return (
-    <Container className={S.root}>
+    <Container className={cn(S.root, isLoading && S.isLoading)}>
       <h1>
         {data?.name}
         <div className={S.gap} />
-        <DatePickerInput
-          size="s"
-          value={dateInterval}
-          onChange={onDateIntervalChange}
-          buttonProps={{ round: true }}
-          popupProps={{
-            blur: true,
-            elevation: 1,
-            contentProps: { className: S.datePicker },
-          }}
-        />
+        <div className={S.controls}>
+          {!isLastWeek && (
+            <Button
+              variant="clear"
+              size="s"
+              round
+              onClick={() => {
+                const startDate = new Date(today - week);
+                const endDate = new Date(todayEnd);
+                setDateInterval([
+                  startDate.toLocaleDateString('sv-SE'),
+                  endDate.toLocaleDateString('sv-SE'),
+                ]);
+              }}
+            >
+              Last week
+            </Button>
+          )}
+          <DatePickerInput
+            size="s"
+            value={dateInterval}
+            onChange={onDateIntervalChange}
+            buttonProps={{ round: true }}
+            popupProps={{
+              blur: true,
+              animation: false,
+              elevation: 1,
+              contentProps: { className: S.datePicker },
+            }}
+          />
+        </div>
       </h1>
 
       {report && (

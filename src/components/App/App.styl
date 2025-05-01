@@ -17,6 +17,7 @@ body
   // flex-direction column
 
 .sidebar
+  position relative
   display flex
   flex-direction column
   flex-shrink 0
@@ -43,6 +44,7 @@ body
   height 80px
   width 100%
   margin 0 auto
+  font-size 40px
 
   & > label
     position absolute
@@ -61,6 +63,13 @@ body
   position relative
   flex-grow 1
 
+.version
+  position absolute
+  bottom var(--indent-l)
+  right var(--indent-l)
+  text-align center
+  font-size 10px
+  color var(--accent-color-alpha-500)
 
 @media screen and (max-width: unit(MOBILE, 'px'))
   .sidebar

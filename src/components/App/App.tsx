@@ -54,6 +54,8 @@ export default function App() {
               checked={app.isDarkTheme()}
             />
           </div>
+
+          <div className={S.version}>{VERSION}</div>
         </div>
 
         <div className={S.content}>

@@ -1,5 +1,12 @@
 json('../../constants/layoutBreakpoints.json')
 
+.root
+  transition opacity .2s ease-out
+
+  &.isLoading
+    opacity 0.3
+    pointer-events none
+
 .root h1
   position sticky
   top 0
@@ -29,12 +36,19 @@ json('../../constants/layoutBreakpoints.json')
   font-weight bold
   background-color var(--accent-color-alpha-100)
 
+.controls
+  display flex
+  align-items center
+  gap 10px
+  font-size 0
+
 .datePicker
   max-width 300px
   min-width 300px
 
 .gap
   flex-grow 1
+
 
 @media screen and (max-width: unit(MOBILE, 'px'))
   .root h1

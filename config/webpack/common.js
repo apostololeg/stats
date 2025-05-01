@@ -3,18 +3,11 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-// const ComponentDirectoryPlugin = require('component-directory-webpack-plugin');
 const FaviconWebpackPlugin = require('favicons-webpack-plugin');
 
 const pkg = require('../../package.json');
 const paths = require('../paths');
-const {
-  PRODUCTION,
-  PROTOCOL,
-  HOST,
-  SENTRY_DSN,
-  MAPBOX_ACCESS_TOKEN,
-} = require('../const');
+const { PRODUCTION, PROTOCOL, HOST, SENTRY_DSN } = require('../const');
 
 module.exports = {
   target: 'web',
@@ -126,7 +119,6 @@ module.exports = {
       PROTOCOL: JSON.stringify(PROTOCOL),
       HOST: JSON.stringify(HOST),
       SENTRY_DSN: JSON.stringify(SENTRY_DSN),
-      MAPBOX_ACCESS_TOKEN: JSON.stringify(MAPBOX_ACCESS_TOKEN),
     }),
     new webpack.ProvidePlugin({
       React: 'react',

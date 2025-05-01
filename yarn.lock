@@ -2080,10 +2080,10 @@
     svgo "^3.0.2"
     timen "^0.1.0"
 
-"@homecode/ui@^4.22.15":
-  version "4.22.15"
-  resolved "https://registry.yarnpkg.com/@homecode/ui/-/ui-4.22.15.tgz#682570b079a3d98ddfb3f94e57c94fd45d6cfa81"
-  integrity sha512-1Xsl26Ajpe6YbpfsreAjPQs7VNsuhdvlZYCR05sec3i+pukvCmXYDfEmyly5omnE6tcv3atp1GBDu2RKZYSePQ==
+"@homecode/ui@^4.22.16":
+  version "4.22.16"
+  resolved "https://registry.yarnpkg.com/@homecode/ui/-/ui-4.22.16.tgz#06470260f9ee8cee153cc5d64f8e95e00cb73ef3"
+  integrity sha512-nZn+QUEKjYO8iU0EYX2L1pRamvqDIyz5yeJNyz3yVkJ1Tnm9OsrKTbDwgcaYIe86uLllZ1lrFjIGhqkV5+1CIA==
   dependencies:
     "@homecode/ui" "^4.17.2"
     "@pmmmwh/react-refresh-webpack-plugin" "^0.5.10"
