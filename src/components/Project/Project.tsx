@@ -2,7 +2,7 @@ import { useStore } from 'justorm/react';
 import { useEffect, useState } from 'react';
 import { buildInterval } from 'store/reports';
 
-import { DatePickerInput } from '@homecode/ui';
+import { DatePickerInput, LS } from '@homecode/ui';
 import S from './Project.styl';
 import { Container } from 'components/UI/Container/Container';
 
@@ -10,29 +10,37 @@ const today = new Date().setHours(0, 0, 0, 0);
 const todayEnd = new Date().setHours(23, 59, 59, 999);
 const week = 1000 * 60 * 60 * 24 * 7;
 
-const startDate = new Date(today - week);
-const endDate = new Date(todayEnd);
+const getInitialDateInterval = () => {
+  const dateInterval = LS.get('project.dateInterval');
+  if (dateInterval) return dateInterval;
+
+  const startDate = new Date(today - week);
+  const endDate = new Date(todayEnd);
+
+  return [
+    startDate.toLocaleDateString('sv-SE'),
+    endDate.toLocaleDateString('sv-SE'),
+  ];
+};
 
 export default function Project({ pathParams: { pid } }) {
   const { projects, reports } = useStore({
     projects: ['items'],
     reports: ['items', 'isLoading'],
   });
-  const [dateInterval, setDateInterval] = useState([
-    startDate.toLocaleDateString('sv-SE'),
-    endDate.toLocaleDateString('sv-SE'),
-  ]);
+  const [dateInterval, setDateInterval] = useState(getInitialDateInterval());
 
   const data = projects.items.find(project => project.id === pid);
   const projectReport = reports.items[pid];
-  const startDateISO = startDate.toISOString();
-  const endDateISO = endDate.toISOString();
-  const interval = buildInterval(...dateInterval);
+  const interval = buildInterval(dateInterval[0], dateInterval[1]);
   const report = projectReport?.[interval];
   const eventsEntries = Object.entries(report?.events ?? {});
   const pagesEntries = Object.entries(report?.pages ?? {});
 
-  console.log('dateInterval', dateInterval);
+  const onDateIntervalChange = (dateInterval: [string, string]) => {
+    setDateInterval(dateInterval);
+    LS.set('project.dateInterval', dateInterval);
+  };
 
   useEffect(() => {
     if (!data) {
@@ -58,7 +66,7 @@ export default function Project({ pathParams: { pid } }) {
         <DatePickerInput
           size="s"
           value={dateInterval}
-          onChange={setDateInterval}
+          onChange={onDateIntervalChange}
           buttonProps={{ round: true }}
           popupProps={{
             blur: true,
