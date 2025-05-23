@@ -24,6 +24,12 @@ export type Report = {
   totalUsersByCountry: number;
   totalPageViews: number;
   totalEvents: number;
+
+  plotData: {
+    usersByCountry: { [country: string]: number };
+    pageViews: { [page: string]: { date: string; views: number } };
+    events: { [event: string]: { date: string; count: number } };
+  };
 };
 
 const STORE = createStore('reports', {

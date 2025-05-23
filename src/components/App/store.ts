@@ -9,7 +9,7 @@ const initialThemeType =
   (LS.get('theme') as 'light' | 'dark') ??
   (window.matchMedia('(prefers-color-scheme:light)') ? 'light' : 'dark');
 
-const activeColor = '#0071ff';
+export const activeColor = '#0071ff';
 
 export default createStore('app', {
   update: null,

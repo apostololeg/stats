@@ -1,6 +1,7 @@
 import { useStore } from 'justorm/react';
 
 import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
+import { reportEvent } from 'tools/analytics';
 
 type Props = {
   itemProps?: any;
@@ -13,7 +14,15 @@ export default function ProjectsList({ itemProps, renderItem }: Props) {
   });
 
   return projects.items.map(({ id, name }) => (
-    <ButtonLink {...itemProps} href={`/project/${id}`} key={id}>
+    <ButtonLink
+      {...itemProps}
+      onClick={e => {
+        itemProps?.onClick?.(e);
+        reportEvent('project_click');
+      }}
+      href={`/project/${id}`}
+      key={id}
+    >
       {renderItem?.({ id, name }) || name}
     </ButtonLink>
   ));

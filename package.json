@@ -102,6 +102,7 @@
     "react-dom": "^18.2.0",
     "react-hot-loader": "^4.13.0",
     "react-svg-loader": "^3.0.3",
+    "recharts": "^2.15.3",
     "roddeh-i18n": "^1.2.1",
     "sharp": "^0.32.1",
     "terser-webpack-plugin": "^5.2.3",
