@@ -1,11 +1,13 @@
 import { useStore } from 'justorm/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildInterval, Report } from 'store/reports';
 import cn from 'classnames';
 
-import { Button, DatePickerInput, LS, useDebounce } from '@homecode/ui';
+import { Button, DatePickerInput, Icon, LS, useDebounce } from '@homecode/ui';
 import S from './Project.styl';
 import { Container } from 'components/UI/Container/Container';
+import { Plot, PlotDataItem } from 'components/UI/Plot/Plot';
+import { reportEvent } from 'tools/analytics';
 
 const today = new Date().setHours(0, 0, 0, 0);
 const todayEnd = new Date().setHours(23, 59, 59, 999);
@@ -67,6 +69,7 @@ export default function Project({ pathParams: { pid } }) {
   const onDateIntervalChange = (dateInterval: string[]) => {
     setDateInterval(dateInterval);
     setReportByInterval();
+    reportEvent('date_interval_change');
   };
 
   useEffect(() => {
@@ -83,6 +86,59 @@ export default function Project({ pathParams: { pid } }) {
     if (reportByInterval) setReport(reportByInterval);
     else updateReport(dateInterval);
   }, [reportByInterval]);
+
+  const usersByCountryPlotData = useMemo(() => {
+    // const plotDataByCountry = {} as Record<string, PlotDataItem[]>;
+    const dateData = Object.entries(report?.plotData?.usersByCountry ?? {});
+
+    return dateData.reduce((acc, [date, countByCountry]) => {
+      acc[date] = Object.values(countByCountry).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+      return acc;
+    }, {});
+
+    // const initCountry = (country: string) => {
+    //   if (plotDataByCountry[country]) return;
+    //   plotDataByCountry[country] = new Array(dateData.length).fill({
+    //     value: 0,
+    //     name: `${country} - 0`,
+    //   });
+    // };
+
+    // dateData.forEach(([date, countByCountry], dateIndex) => {
+    //   Object.entries(countByCountry).forEach(([country, count]) => {
+    //     initCountry(country);
+    //     plotDataByCountry[country][dateIndex] = {
+    //       value: count,
+    //       name: `${country} - ${count}`,
+    //     };
+    //   });
+    // });
+
+    // return Object.values(plotDataByCountry);
+  }, [report]);
+
+  const pagesViewsPlotData = useMemo(() => {
+    return Object.values(report?.plotData?.pageViews ?? {}).reduce(
+      (acc, { date, views }) => {
+        acc[date] = views;
+        return acc;
+      },
+      {}
+    );
+  }, [report?.plotData?.pageViews]);
+
+  const eventsPlotData = useMemo(() => {
+    return Object.values(report?.plotData?.events ?? {}).reduce(
+      (acc, { date, count }) => {
+        acc[date] = count;
+        return acc;
+      },
+      {}
+    );
+  }, [report?.plotData?.events]);
 
   return (
     <Container className={cn(S.root, isLoading && S.isLoading)}>
@@ -102,6 +158,7 @@ export default function Project({ pathParams: { pid } }) {
                   startDate.toLocaleDateString('sv-SE'),
                   endDate.toLocaleDateString('sv-SE'),
                 ]);
+                reportEvent('last_week_click');
               }}
             >
               Last week
@@ -119,12 +176,23 @@ export default function Project({ pathParams: { pid } }) {
               contentProps: { className: S.datePicker },
             }}
           />
+          <Button
+            variant="text"
+            size="s"
+            round
+            onClick={() => {
+              console.log('sync');
+            }}
+          >
+            <Icon name="syncArrows" />
+          </Button>
         </div>
       </h1>
 
       {report && (
         <>
           <h2>Users by country</h2>
+          <Plot data={usersByCountryPlotData} />
           {usersByCountryEntries.length > 0 ? (
             <table>
               <tbody>
@@ -147,6 +215,7 @@ export default function Project({ pathParams: { pid } }) {
           )}
 
           <h2>Pages views</h2>
+          <Plot data={pagesViewsPlotData} />
           {pagesEntries.length > 0 ? (
             <table>
               <tbody>
@@ -169,6 +238,7 @@ export default function Project({ pathParams: { pid } }) {
           )}
 
           <h2>Events</h2>
+          <Plot data={eventsPlotData} />
           {eventsEntries.length > 0 ? (
             <table>
               <tbody>
