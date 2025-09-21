@@ -1,4 +1,11 @@
-import { Button, DatePickerInput, Icon, LS, useDebounce } from '@homecode/ui';
+import {
+  Button,
+  DatePickerInput,
+  Icon,
+  LS,
+  Tooltip,
+  useDebounce,
+} from '@homecode/ui';
 import cn from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -59,21 +66,25 @@ export default function Project({ pathParams: { pid } }) {
   const isLoading =
     projects.loadingByPid[pid] || reports.isLoadingByInterval[intervalStr];
 
-  const updateReport = useDebounce(() => {
+  const updateReport = useDebounce((force = false) => {
     const [startDate, endDate] = dateIntervalRef.current;
-    reports.load({ pid, startDate, endDate });
+    reports.load({ pid, startDate, endDate }, force);
   }, 500);
 
   const setReportByInterval = () => {
     const report = getReportByInterval();
     if (report) setReport(report);
-    else updateReport(dateInterval);
+    else updateReport();
   };
 
   const onDateIntervalChange = (dateInterval: string[]) => {
     setDateInterval(dateInterval);
     setReportByInterval();
     reportEvent('date_interval_change');
+  };
+
+  const onRefreshReportClick = () => {
+    updateReport(true);
   };
 
   useEffect(() => {
@@ -181,16 +192,16 @@ export default function Project({ pathParams: { pid } }) {
               contentProps: { className: S.datePicker },
             }}
           />
-          <Button
-            variant="text"
-            size="s"
-            round
-            onClick={() => {
-              console.log('sync');
-            }}
-          >
-            <Icon name="syncArrows" />
-          </Button>
+          <Tooltip content="Update report" direction="bottom">
+            <Button
+              variant="text"
+              size="s"
+              round
+              onClick={onRefreshReportClick}
+            >
+              <Icon type="syncArrows" size="s" />
+            </Button>
+          </Tooltip>
         </div>
       </h1>
 

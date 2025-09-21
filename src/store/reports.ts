@@ -1,6 +1,6 @@
 import { LS } from '@homecode/ui';
-import { createStore } from 'justorm/react';
 
+import { createStore } from 'justorm/react';
 import { api } from 'tools/request';
 
 export const buildInterval = (startDate: string, endDate: string) =>
@@ -37,7 +37,7 @@ const STORE = createStore('reports', {
 
   isLoadingByInterval: {} as { [interval: string]: boolean },
 
-  async load(data: RequestParams) {
+  async load(data: RequestParams, force = false) {
     const { pid, startDate, endDate } = data;
     const interval = buildInterval(startDate, endDate);
 
@@ -46,7 +46,7 @@ const STORE = createStore('reports', {
     // try get from cache
     const lsKey = `report-${pid}-${interval}`;
     const cachedReport = LS.get(lsKey);
-    if (cachedReport) {
+    if (cachedReport && !force) {
       this.items[pid][interval] = cachedReport;
       return;
     }
