@@ -36,7 +36,7 @@
   },
   "standard-version": {
     "scripts": {
-      "postchangelog": "replace ' (SB-\\d+)' ' [`$1`](https://tracker.yandex.ru/$1)' CHANGELOG.md"
+      "postchangelog": "replace ' (SB-\\d+)' ' [`$1`](https://github.com/apostololeg/stat/issues/$1)' CHANGELOG.md"
     }
   },
   "dependencies": {
