@@ -9,7 +9,7 @@ import throttle from '../tools/throttle';
 import { getClientToken, generateClientId } from '../tools/tokens';
 import { timezoneCity2Country } from '../tools/timezoneCity2Country';
 
-// import { adminMidleware } from './auth';
+// import { adminMiddleware } from './auth';
 
 const router = express.Router();
 

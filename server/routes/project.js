@@ -4,7 +4,7 @@ import db from '../api/db';
 import { PAGE_SIZE } from '../../src/shared/db';
 import { parseIds } from '../../src/shared/parsers';
 
-import { adminMidleware } from './auth';
+import { adminMiddleware } from './auth';
 import { allowedOrigins } from '../middlewares/allowedOrigins';
 
 const router = express.Router();
@@ -30,7 +30,7 @@ export default router
     res.json({ projects, total });
   })
 
-  .post('/', adminMidleware, async (req, res) => {
+  .post('/', adminMiddleware, async (req, res) => {
     let { name, domain } = req.body;
 
     if (!/\/$/.test(domain)) domain += '/';
@@ -44,7 +44,7 @@ export default router
     res.json({ project, total });
   })
 
-  .delete('/:id', adminMidleware, async (req, res) => {
+  .delete('/:id', adminMiddleware, async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
     try {

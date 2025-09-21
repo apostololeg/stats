@@ -6,7 +6,7 @@ import { SESSION_EXPIRED_AFTER, COOKIE_TOKEN_NAME } from '../../config/const';
 
 const router = Router();
 
-export const adminMidleware = (req, res, next) => {
+export const adminMiddleware = (req, res, next) => {
   if (!isAdmin(req)) return res.status(403).send('Forbidden');
   next();
 };
