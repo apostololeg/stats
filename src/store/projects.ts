@@ -1,8 +1,8 @@
-import { createStore } from 'justorm/react';
+import { createStore, useStore } from 'justorm/react';
 
 import { api } from 'tools/request';
 
-export default createStore('projects', {
+const STORE = createStore('projects', {
   items: [],
 
   loadingByPid: {},
@@ -27,3 +27,13 @@ export default createStore('projects', {
     this.items.push(res.project);
   },
 });
+
+export type ProjectsStore = typeof STORE;
+export default STORE;
+
+export const useProjects = (
+  fields: (keyof ProjectsStore)[] = []
+): ProjectsStore => {
+  const store = useStore<{ projects: ProjectsStore }>({ projects: fields });
+  return store.projects;
+};

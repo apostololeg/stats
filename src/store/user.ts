@@ -1,4 +1,4 @@
-import { createStore } from 'justorm/react';
+import { createStore, useStore } from 'justorm/react';
 import { LS } from '@homecode/ui';
 
 import { api } from 'tools/request';
@@ -22,4 +22,10 @@ const STORE = createStore('user', {
   },
 });
 
+export type UserStore = typeof STORE;
 export default STORE;
+
+export const useUser = (fields: (keyof UserStore)[] = []) => {
+  const store = useStore<{ user: UserStore }>({ user: fields });
+  return store.user;
+};

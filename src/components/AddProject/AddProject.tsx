@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import cn from 'classnames';
-import { Button, Form, Icon } from '@homecode/ui';
+import { Button, Form, Icon, RouterStore } from '@homecode/ui';
 
-import ProjectsStore from 'store/projects';
+import { useProjects } from 'store/projects';
 
 import S from './AddProject.styl';
 
@@ -12,6 +12,8 @@ const validationSchema = {
 };
 
 export default function AddProject() {
+  const projects = useProjects();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +24,10 @@ export default function AddProject() {
   const onSubmit = useCallback(async ({ name, domain }) => {
     setIsLoading(true);
     try {
-      await ProjectsStore.add({ name, domain });
+      const res = await projects.add({ name, domain });
+      if (res?.project?.id) {
+        RouterStore.go(`/project/${res.project.id}`);
+      }
     } finally {
       setIsLoading(false);
       setIsOpen(false);

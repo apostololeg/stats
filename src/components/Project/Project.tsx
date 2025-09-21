@@ -8,6 +8,8 @@ import S from './Project.styl';
 import { Container } from 'components/UI/Container/Container';
 import { Plot, PlotDataItem } from 'components/UI/Plot/Plot';
 import { reportEvent } from 'tools/analytics';
+import { useUser } from 'store/user';
+import EmbedButton from 'components/EmbedButton/EmbedButton';
 
 const today = new Date().setHours(0, 0, 0, 0);
 const todayEnd = new Date().setHours(23, 59, 59, 999);
@@ -20,6 +22,7 @@ const INITIAL_DATE_INTERVAL =
   LS.get('project.dateInterval') || lastWeekInterval;
 
 export default function Project({ pathParams: { pid } }) {
+  const user = useUser(['isLogged']);
   const { projects, reports } = useStore({
     projects: ['items', 'loadingByPid'],
     reports: ['items', 'isLoadingByInterval'],
@@ -144,6 +147,7 @@ export default function Project({ pathParams: { pid } }) {
     <Container className={cn(S.root, isLoading && S.isLoading)}>
       <h1>
         {data?.name}
+        {user.isLogged && <EmbedButton pid={pid} />}
         <div className={S.gap} />
         <div className={S.controls}>
           {!isLastWeek && (

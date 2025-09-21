@@ -139,23 +139,7 @@ module.exports = {
         },
       ],
     }),
-    new HtmlWebpackPlugin({
-      title: 'Stats',
-      filename: 'index.html',
-      template: `${paths.assets}/index.html`,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true,
-      },
-    }),
+
     new FaviconWebpackPlugin({
       logo: `${paths.assets}/icon.svg`,
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
@@ -174,6 +158,24 @@ module.exports = {
         },
       },
     }),
+    new HtmlWebpackPlugin({
+      title: 'Stats',
+      filename: 'index.html',
+      template: `${paths.assets}/index.html`,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }),
+
     new MiniCssExtractPlugin({
       filename: PRODUCTION ? '[name].[hash].css' : '[name].css',
       chunkFilename: PRODUCTION ? '[id].[hash].css' : '[id].css',
