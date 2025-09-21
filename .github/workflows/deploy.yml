@@ -28,6 +28,9 @@ jobs:
       - name: Build project
         run: yarn build:prod
 
+      - name: Generate Prisma client
+        run: yarn prisma generate
+
       - name: Setup SSH
         run: |
           # Create SSH directory
@@ -83,6 +86,12 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/temp_deploy"
           rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" build/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
 
+          # Upload server files
+          scp -i ~/.ssh/id_ed25519 -r server/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
+          scp -i ~/.ssh/id_ed25519 -r prisma/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
+          scp -i ~/.ssh/id_ed25519 package.json yarn.lock ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
+          scp -i ~/.ssh/id_ed25519 babel.config.json ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
+
           # Move files to deployment directory and set proper permissions
           echo "Moving files to deployment directory and setting proper permissions..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
@@ -91,6 +100,44 @@ jobs:
             sudo find ${{ secrets.VPS_DEPLOY_PATH }} -type d -exec chmod 755 {} \;
             sudo find ${{ secrets.VPS_DEPLOY_PATH }} -type f -exec chmod 644 {} \;
             rm -rf ~/temp_deploy
+          "
+
+          # Install server dependencies and run database migrations
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ secrets.VPS_DEPLOY_PATH }}
+            sudo -u www-data yarn install --production --frozen-lockfile
+            sudo -u www-data yarn prisma generate
+            sudo -u www-data yarn prisma migrate deploy
+          "
+
+          # Restart server process
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            # Stop existing server if running
+            sudo systemctl stop stat-server || true
+
+            # Create systemd service file if it doesn't exist
+            sudo tee /etc/systemd/system/stat-server.service > /dev/null << 'EOF'
+            [Unit]
+            Description=Stats Server
+            After=network.target
+
+            [Service]
+            Type=simple
+            User=www-data
+            WorkingDirectory=${{ secrets.VPS_DEPLOY_PATH }}
+            Environment=NODE_ENV=production
+            ExecStart=/usr/bin/yarn server:prod
+            Restart=always
+            RestartSec=10
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+            # Reload systemd and start service
+            sudo systemctl daemon-reload
+            sudo systemctl enable stat-server
+            sudo systemctl start stat-server
           "
 
           # Reload nginx
@@ -126,9 +173,11 @@ jobs:
               BACKUP_DIR=\$(ls -td ${{ secrets.VPS_DEPLOY_PATH }}.backup.* 2>/dev/null | head -n1)
               if [ ! -z \"\$BACKUP_DIR\" ] && [ -d \"\$BACKUP_DIR\" ]; then
                 echo \"Found backup directory: \$BACKUP_DIR\"
+                sudo systemctl stop stat-server || true
                 sudo rm -rf ${{ secrets.VPS_DEPLOY_PATH }}/*
                 sudo cp -r \"\$BACKUP_DIR\"/* ${{ secrets.VPS_DEPLOY_PATH }}/
                 sudo chown -R www-data:www-data ${{ secrets.VPS_DEPLOY_PATH }}
+                sudo systemctl start stat-server
                 sudo systemctl reload nginx
                 echo 'Rollback completed successfully'
               else
