@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/apostololeg/stat/compare/v1.1.0...v1.2.0) (2025-09-21)
+
+
+### Features
+
+* EmbedButton - copy; update ui and store pkgs ([7abc950](https://github.com/apostololeg/stat/commit/7abc950681fe485af91096ace3bda84e6bfad3de))
+* Project - edit/delete ([31a4119](https://github.com/apostololeg/stat/commit/31a411924265d6fe575146bba220fca587eae6f3))
+* Reload report ([42c7dc9](https://github.com/apostololeg/stat/commit/42c7dc9fda7f8477640824d8073b645dd69b35d1))
+* Report - collect and include plotData ([d953324](https://github.com/apostololeg/stat/commit/d953324bd060811922eea7268a1889e6048fd894))
+* Reports - caching by pid and interval ([589a90e](https://github.com/apostololeg/stat/commit/589a90e7a521d305c4a1bf9921307d1e0c054701))
+
+
+### Bug Fixes
+
+* disable brotli ([ac83fb9](https://github.com/apostololeg/stat/commit/ac83fb9dff019a078e983cb20bf7a21af3571037))
+* Report counts and format ([b12845c](https://github.com/apostololeg/stat/commit/b12845c690c03dfa9b664eb8c0e2c42c8095212b))
+* standart-version - postchangelog replace issue links ([89c63c4](https://github.com/apostololeg/stat/commit/89c63c42406a79a573247628c7602f4502f82fcb))
+
 ## [1.1.0](https://github.com/apostololeg/stat/compare/v1.0.0...v1.1.0) (2025-05-01)
 
 
