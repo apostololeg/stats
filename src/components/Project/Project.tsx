@@ -1,15 +1,16 @@
-import { useStore } from 'justorm/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { buildInterval, Report } from 'store/reports';
-import cn from 'classnames';
-
 import { Button, DatePickerInput, Icon, LS, useDebounce } from '@homecode/ui';
-import S from './Project.styl';
-import { Container } from 'components/UI/Container/Container';
-import { Plot, PlotDataItem } from 'components/UI/Plot/Plot';
-import { reportEvent } from 'tools/analytics';
-import { useUser } from 'store/user';
+import cn from 'classnames';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 import EmbedButton from 'components/EmbedButton/EmbedButton';
+import { Container } from 'components/UI/Container/Container';
+import { Plot } from 'components/UI/Plot/Plot';
+import { useStore } from 'justorm/react';
+import { Report, buildInterval } from 'store/reports';
+import { useUser } from 'store/user';
+import { reportEvent } from 'tools/analytics';
+
+import S from './Project.styl';
 
 const today = new Date().setHours(0, 0, 0, 0);
 const todayEnd = new Date().setHours(23, 59, 59, 999);
@@ -97,7 +98,7 @@ export default function Project({ pathParams: { pid } }) {
     return dateData.reduce((acc, [date, countByCountry]) => {
       acc[date] = Object.values(countByCountry).reduce(
         (sum, count) => sum + count,
-        0
+        0,
       );
       return acc;
     }, {});
@@ -129,7 +130,7 @@ export default function Project({ pathParams: { pid } }) {
         acc[date] = views;
         return acc;
       },
-      {}
+      {},
     );
   }, [report?.plotData?.pageViews]);
 
@@ -139,7 +140,7 @@ export default function Project({ pathParams: { pid } }) {
         acc[date] = count;
         return acc;
       },
-      {}
+      {},
     );
   }, [report?.plotData?.events]);
 

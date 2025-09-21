@@ -1,22 +1,12 @@
-import { useStore } from 'justorm/react';
+import { Checkbox, Notifications, Scroll, Theme, VH, dom } from '@homecode/ui';
 import cn from 'classnames';
-import {
-  Checkbox,
-  Notifications,
-  Scroll,
-  Theme,
-  VH,
-  dom,
-  RouterStore,
-} from '@homecode/ui';
-
-import Routes from 'components/Routes/Routes';
 
 import Header from 'components/Header/Header';
 import ProjectsList from 'components/ProjectsList/ProjectsList';
-import AddProject from 'components/AddProject/AddProject';
+import Routes from 'components/Routes/Routes';
+import { useStore } from 'justorm/react';
+
 import S from './App.styl';
-import { useUser } from 'store/user';
 
 require('./store');
 // @ts-ignore
@@ -25,13 +15,10 @@ require('./store');
 dom.watchControllerFlag();
 
 export default function App() {
-  const user = useUser(['isLogged']);
   const { app } = useStore({
     app: ['theme', 'isSidebarOpen'],
     projects: [],
   });
-
-  console.log('>>>>. user', user);
 
   return (
     <>
@@ -55,7 +42,6 @@ export default function App() {
                 onClick: app.toggleSidebar,
               }}
             />
-            {user.isLogged && <AddProject />}
           </Scroll>
 
           <div className={S.darkThemeCheckbox}>

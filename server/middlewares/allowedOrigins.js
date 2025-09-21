@@ -1,9 +1,17 @@
 import db from '../api/db';
 
-export let allowedOrigins = [];
+let allowedOrigins = [];
+
+export const addAllowedOrigin = domain => {
+  allowedOrigins.push(domain);
+};
+
+export const removeAllowedOrigin = domain => {
+  allowedOrigins = allowedOrigins.filter(d => d !== domain);
+};
 
 db.project.findMany().then(projects => {
-  allowedOrigins = [...projects.map(p => p.domain)];
+  allowedOrigins.push(...projects.map(p => p.domain));
   console.log('===allowedOrigins', allowedOrigins);
 });
 

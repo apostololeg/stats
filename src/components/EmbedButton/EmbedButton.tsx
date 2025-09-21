@@ -1,7 +1,8 @@
 import { Button, Icon, Popup } from '@homecode/ui';
 import cn from 'classnames';
-import S from './EmbedButton.styl';
 import { useState } from 'react';
+
+import S from './EmbedButton.styl';
 
 export default function EmbedButton({ pid }: { pid: string }) {
   const [isCopied, setIsCopied] = useState(false);

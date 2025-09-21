@@ -1,11 +1,13 @@
 import express from 'express';
 
-import db from '../api/db';
 import { PAGE_SIZE } from '../../src/shared/db';
 import { parseIds } from '../../src/shared/parsers';
-
+import db from '../api/db';
+import {
+  addAllowedOrigin,
+  removeAllowedOrigin,
+} from '../middlewares/allowedOrigins';
 import { adminMiddleware } from './auth';
-import { allowedOrigins } from '../middlewares/allowedOrigins';
 
 const router = express.Router();
 
@@ -19,7 +21,7 @@ export default router
 
     if (!params.take || params.take > PAGE_SIZE) params.take = PAGE_SIZE;
 
-    params.select = { id: true, name: true };
+    params.select = { id: true, name: true, domain: true };
     params.orderBy = {
       updatedAt: 'desc',
       ...params?.orderBy,
@@ -31,28 +33,38 @@ export default router
   })
 
   .post('/', adminMiddleware, async (req, res) => {
-    let { name, domain } = req.body;
+    let { id, name, domain } = req.body;
 
     if (!/\/$/.test(domain)) domain += '/';
 
     const data = { name, domain };
-    const project = await db.project.create({ data });
+    const project = await db.project.upsert({
+      where: { id },
+      create: data,
+      update: data,
+    });
 
-    allowedOrigins.push(domain);
+    addAllowedOrigin(domain);
 
     total++;
     res.json({ project, total });
   })
 
   .delete('/:id', adminMiddleware, async (req, res) => {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
 
+    console.log('===id', id);
     try {
-      const res = await db.project.delete({ where: { id } });
+      const prj = await db.project.findUnique({ where: { id } });
+      console.log(' === domain to delete', prj.domain);
+      await db.project.delete({ where: { id } });
+
+      removeAllowedOrigin(prj.domain);
       total--;
 
-      res.json({ total });
+      res.json({ ok: true, total });
     } catch (e) {
+      console.log(' --- error', e);
       res.status(404).send('Not found');
     }
   });

@@ -1,0 +1,27 @@
+.item
+  display flex
+  justify-content space-between
+  align-items center
+
+  & + &
+    margin-top var(--indent-s)
+
+.actions
+  position absolute
+  right var(--indent-m)
+  display flex
+  align-items center
+  gap 2px
+  opacity 0
+
+  .item:hover &
+    opacity 1
+
+
+.footer
+  display flex
+  justify-content center
+  
+.addButton
+  // width 100%
+  margin var(--indent-m) auto 0
