@@ -6,7 +6,6 @@ node_modules/
 # configs
 .gitsecret/keys/random_seed
 .env
-package-lock.json
 yarn-error.log
 !*.secret
 .vscode
