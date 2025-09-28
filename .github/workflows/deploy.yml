@@ -66,7 +66,7 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             if [ -d ${{ secrets.VPS_DEPLOY_PATH }} ] && [ \$(ls -A ${{ secrets.VPS_DEPLOY_PATH }} 2>/dev/null | wc -l) -gt 0 ]; then
               BACKUP_DIR=${{ secrets.VPS_DEPLOY_PATH }}.backup.\$(date +%Y%m%d_%H%M%S)
-              sudo cp -r ${{ secrets.VPS_DEPLOY_PATH }} \"\$BACKUP_DIR\"
+              sudo rsync -a --exclude='node_modules' ${{ secrets.VPS_DEPLOY_PATH }}/ \"\$BACKUP_DIR\"
               sudo chown -R ci:ci \"\$BACKUP_DIR\"
               echo \"Created backup: \$BACKUP_DIR\"
             fi
