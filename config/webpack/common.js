@@ -5,9 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const FaviconWebpackPlugin = require('favicons-webpack-plugin');
 
-const pkg = require('../../package.json');
 const paths = require('../paths');
-const { PRODUCTION, PROTOCOL, HOST, SENTRY_DSN } = require('../const');
+const { PRODUCTION, VERSION } = require('../const');
 
 module.exports = {
   target: 'web',
@@ -114,11 +113,8 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
-      VERSION: JSON.stringify(pkg.version),
+      VERSION: JSON.stringify(VERSION),
       PRODUCTION: JSON.stringify(PRODUCTION),
-      PROTOCOL: JSON.stringify(PROTOCOL),
-      HOST: JSON.stringify(HOST),
-      SENTRY_DSN: JSON.stringify(SENTRY_DSN),
     }),
     new webpack.ProvidePlugin({
       React: 'react',

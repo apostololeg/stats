@@ -4,13 +4,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 
 const common = require('./common');
 const paths = require('../paths');
-const {
-  PROTOCOL,
-  HOST,
-  SERVER_PORT,
-  DEV_PORT,
-  PRODUCTION,
-} = require('../const.js');
+const { SERVER_PORT, DEV_PORT, PRODUCTION } = require('../const.js');
 
 const BundleAnalyzerPlugin =
   require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -19,9 +13,7 @@ const proxyConfig = {
   secure: false,
   changeOrigin: true,
   logLevel: 'debug',
-  target: PRODUCTION
-    ? `${PROTOCOL}${HOST}/`
-    : `http://localhost:${SERVER_PORT}/`,
+  target: PRODUCTION ? `${DOMAIN}/` : `http://localhost:${SERVER_PORT}/`,
 };
 
 const plugins = [

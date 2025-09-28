@@ -5,7 +5,6 @@ import App from 'components/App/App';
 
 if (PRODUCTION) {
   import('./pwa');
-  // import('@sentry/react').then(Sentry => Sentry.init({ dsn: SENTRY_DSN }));
 }
 
 const root = ReactDOM.createRoot(document.getElementById('app-root'));

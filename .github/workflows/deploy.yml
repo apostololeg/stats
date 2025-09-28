@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches: [master]
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   'build-and-deploy':
@@ -16,17 +16,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
-
-      - name: Install Yarn
-        run: npm install -g yarn
+          node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Build project
-        run: yarn build:prod
+        run: npm run build
 
       - name: Setup SSH
         run: |
