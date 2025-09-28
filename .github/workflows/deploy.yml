@@ -62,6 +62,7 @@ jobs:
       - name: Deploy to VPS
         run: |
           # Create backup of current deployment
+          echo "Creating backup of current deployment..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             if [ -d ${{ secrets.VPS_DEPLOY_PATH }} ] && [ \$(ls -A ${{ secrets.VPS_DEPLOY_PATH }} 2>/dev/null | wc -l) -gt 0 ]; then
               BACKUP_DIR=${{ secrets.VPS_DEPLOY_PATH }}.backup.\$(date +%Y%m%d_%H%M%S)
@@ -72,15 +73,18 @@ jobs:
           "
 
           # Clear deployment directory
+          echo "Clearing deployment directory..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             sudo rm -rf ${{ secrets.VPS_DEPLOY_PATH }}/*
           "
 
           # Upload new build to temporary directory
+          echo "Uploading new build to temporary directory..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/temp_deploy"
           scp -i ~/.ssh/id_ed25519 -r build/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
 
           # Move files to deployment directory and set proper permissions
+          echo "Moving files to deployment directory and setting proper permissions..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             sudo cp -r ~/temp_deploy/* ${{ secrets.VPS_DEPLOY_PATH }}/
             sudo chown -R www-data:www-data ${{ secrets.VPS_DEPLOY_PATH }}
@@ -90,11 +94,13 @@ jobs:
           "
 
           # Reload nginx
+          echo "Reloading nginx..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             sudo systemctl reload nginx
           "
 
           # Cleanup old backups (keep only last 3)
+          echo "Cleaning up old backups (keeping only last 3)..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd /var/www
             ls -td ${{ secrets.VPS_DEPLOY_PATH }}.backup.* 2>/dev/null | tail -n +4 | xargs -r rm -rf
