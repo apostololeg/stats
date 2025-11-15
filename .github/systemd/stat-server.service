@@ -1,0 +1,16 @@
+[Unit]
+Description=Stats Server
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory={{VPS_DEPLOY_PATH}}
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/yarn server:prod
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

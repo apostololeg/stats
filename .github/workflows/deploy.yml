@@ -87,6 +87,7 @@ jobs:
           rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" prisma/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/prisma/
           rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" src/shared/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/src/shared/
           scp -i ~/.ssh/id_ed25519 package.json yarn.lock babel.config.json ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
+          scp -i ~/.ssh/id_ed25519 .github/systemd/stat-server.service ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
 
           # Move files to deployment directory and set proper permissions
           echo "Moving files to deployment directory and setting proper permissions..."
@@ -98,26 +99,25 @@ jobs:
             rm -rf ~/temp_deploy
           "
 
-          # Reload nginx
-          echo "Reloading nginx..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            sudo systemctl reload nginx
-          "
 
           # Restart Node.js server
           echo "Restarting Node.js server..."
           ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            # Try PM2 first, then systemd, then manual process
-            if command -v pm2 > /dev/null 2>&1; then
-              pm2 restart all || pm2 reload all
-              echo 'Server restarted via PM2'
-            elif systemctl list-units --type=service | grep -q 'stats\|node\|app'; then
-              sudo systemctl restart stats || sudo systemctl restart node || sudo systemctl restart app
-              echo 'Server restarted via systemd'
+            # Stop existing server if running
+            sudo systemctl stop stat-server 2>/dev/null || true
+
+            # Install systemd service file (replace placeholder with actual path)
+            sed \"s|{{VPS_DEPLOY_PATH}}|${{ vars.VPS_DEPLOY_PATH }}|g\" ${{ vars.VPS_DEPLOY_PATH }}/stat-server.service | sudo tee /etc/systemd/system/stat-server.service > /dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl enable stat-server
+            echo 'Installed and enabled stat-server service'
+
+            # Start the service
+            if sudo systemctl start stat-server; then
+              echo 'Server restarted via systemd (stat-server.service)'
             else
-              # Find and restart node process (adjust pattern as needed)
-              pkill -f 'babel-node.*server' || pkill -f 'node.*server'
-              echo 'Server process killed, ensure it auto-restarts via process manager'
+              echo 'Failed to start stat-server.service'
+              exit 1
             fi
           "
 
