@@ -99,6 +99,23 @@ jobs:
             sudo systemctl reload nginx
           "
 
+          # Restart Node.js server
+          echo "Restarting Node.js server..."
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            # Try PM2 first, then systemd, then manual process
+            if command -v pm2 > /dev/null 2>&1; then
+              pm2 restart all || pm2 reload all
+              echo 'Server restarted via PM2'
+            elif systemctl list-units --type=service | grep -q 'stats\|node\|app'; then
+              sudo systemctl restart stats || sudo systemctl restart node || sudo systemctl restart app
+              echo 'Server restarted via systemd'
+            else
+              # Find and restart node process (adjust pattern as needed)
+              pkill -f 'babel-node.*server' || pkill -f 'node.*server'
+              echo 'Server process killed, ensure it auto-restarts via process manager'
+            fi
+          "
+
           # Cleanup old backups (keep only last 3)
           echo "Cleaning up old backups (keeping only last 3)..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
