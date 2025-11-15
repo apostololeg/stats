@@ -80,9 +80,13 @@ jobs:
 
           # Upload new build and server files to temporary directory
           echo "Uploading new build and server files to temporary directory..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/temp_deploy"
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" build/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
+          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/temp_deploy/src/shared"
+          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" build/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/build/
           rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" server/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/server/
+          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" config/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/config/
+          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" prisma/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/prisma/
+          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" src/shared/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/src/shared/
+          scp -i ~/.ssh/id_ed25519 package.json yarn.lock babel.config.json ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
 
           # Move files to deployment directory and set proper permissions
           echo "Moving files to deployment directory and setting proper permissions..."
