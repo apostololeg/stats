@@ -15,12 +15,25 @@
   const iframe = document.createElement('iframe');
   iframe.src = '{DOMAIN}/api/client/iframe';
   iframe.style.display = 'none';
-  document.body.appendChild(iframe);
+
+  const appendIframe = () => {
+    if (document.body) {
+      document.body.appendChild(iframe);
+    } else {
+      document.addEventListener('DOMContentLoaded', appendIframe);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', appendIframe);
+  } else {
+    appendIframe();
+  }
 
   const report = async data => {
     iframe.contentWindow.postMessage(
       { type: 'stats', ...data, pid, origin },
-      '{DOMAIN}'
+      '{DOMAIN}',
     );
   };
 
