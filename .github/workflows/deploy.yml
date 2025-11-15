@@ -78,10 +78,13 @@ jobs:
             sudo rm -rf ${{ secrets.VPS_DEPLOY_PATH }}/*
           "
 
-          # Upload new build to temporary directory
-          echo "Uploading new build to temporary directory..."
+          # Upload new build and server files to temporary directory
+          echo "Uploading new build and server files to temporary directory..."
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/temp_deploy"
           rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" build/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
+          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" server/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/server/
+          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" config/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/config/
+          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" src/shared/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/src/shared/
 
           # Move files to deployment directory and set proper permissions
           echo "Moving files to deployment directory and setting proper permissions..."
