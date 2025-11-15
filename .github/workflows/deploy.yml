@@ -83,8 +83,6 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/temp_deploy"
           rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" build/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
           rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" server/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/server/
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" config/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/config/
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" src/shared/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/src/shared/
 
           # Move files to deployment directory and set proper permissions
           echo "Moving files to deployment directory and setting proper permissions..."
