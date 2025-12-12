@@ -155,7 +155,10 @@ jobs:
               export npm_config_cache=\\\"$DEPLOY_PATH/.npm-cache\\\" && \
               export YARN_CACHE_FOLDER=\\\"$DEPLOY_PATH/.yarn-cache\\\" && \
               mkdir -p \\\"$DEPLOY_PATH/.npm-cache\\\" \\\"$DEPLOY_PATH/.yarn-cache\\\" && \
-              yarn install --frozen-lockfile --non-interactive --no-progress --production=true\"
+              # We run the server via babel-node (see systemd unit), so Babel presets/plugins from devDependencies
+              # are required at runtime. Force-install devDependencies on the VPS.
+              export YARN_PRODUCTION=false &&
+              yarn install --frozen-lockfile --non-interactive --no-progress --production=false\"
 
             # Install systemd service file (replace placeholder with actual path)
             sed \"s|{{VPS_DEPLOY_PATH}}|\$DEPLOY_PATH|g\" \"\$DEPLOY_PATH\"/stat-server.service | sudo tee /etc/systemd/system/stat-server.service > /dev/null
