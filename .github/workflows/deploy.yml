@@ -149,14 +149,13 @@ jobs:
               sudo npm install -g yarn
             fi
             # Use per-deploy writable caches for yarn/npm. Some native deps (e.g. sharp) write to ~/.npm during install.
-            sudo -u www-data -H bash -lc \"
-              cd \\\"\$DEPLOY_PATH\\\" &&
-              export HOME=\\\"\$DEPLOY_PATH\\\" &&
-              export npm_config_cache=\\\"\$DEPLOY_PATH/.npm-cache\\\" &&
-              export YARN_CACHE_FOLDER=\\\"\$DEPLOY_PATH/.yarn-cache\\\" &&
-              mkdir -p \\\"\$npm_config_cache\\\" \\\"\$YARN_CACHE_FOLDER\\\" \\\"\$HOME\\\" &&
-              yarn install --frozen-lockfile --non-interactive --no-progress --production=true
-            \"
+            # Note: DEPLOY_PATH is a shell var in this SSH session; don't rely on it being exported into the sudo'ed shell.
+            sudo -u www-data -H bash -lc \"cd \\\"$DEPLOY_PATH\\\" && \
+              export HOME=\\\"$DEPLOY_PATH\\\" && \
+              export npm_config_cache=\\\"$DEPLOY_PATH/.npm-cache\\\" && \
+              export YARN_CACHE_FOLDER=\\\"$DEPLOY_PATH/.yarn-cache\\\" && \
+              mkdir -p \\\"$DEPLOY_PATH/.npm-cache\\\" \\\"$DEPLOY_PATH/.yarn-cache\\\" && \
+              yarn install --frozen-lockfile --non-interactive --no-progress --production=true\"
 
             # Install systemd service file (replace placeholder with actual path)
             sed \"s|{{VPS_DEPLOY_PATH}}|\$DEPLOY_PATH|g\" \"\$DEPLOY_PATH\"/stat-server.service | sudo tee /etc/systemd/system/stat-server.service > /dev/null
