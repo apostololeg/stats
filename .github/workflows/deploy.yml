@@ -138,11 +138,20 @@ jobs:
 
       - name: Health check
         run: |
+          # Normalize deploy path (remove trailing slash) for rollback logic below
+          DEPLOY_PATH="${{ vars.VPS_DEPLOY_PATH }}"
+          DEPLOY_PATH="${DEPLOY_PATH%/}"
+
           # Wait a moment for the deployment to settle
           sleep 10
 
-          # Check if the site is responding (follow redirects and accept 200, 301, 302)
-          HTTP_STATUS=$(curl -s -L -o /dev/null -w "%{http_code}" http://${{ secrets.VPS_HOST }})
+          # Check if the site is responding.
+          # Do NOT follow redirects: many setups redirect http -> https, and following can fail with curl exit 60
+          # if TLS is misconfigured. We already accept 301/302 below.
+          CURL_URL="http://${{ secrets.VPS_HOST }}"
+          HTTP_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
+            --connect-timeout 5 --max-time 15 \
+            "$CURL_URL" || echo "000")
 
           if [ $HTTP_STATUS -eq 200 ] || [ $HTTP_STATUS -eq 301 ] || [ $HTTP_STATUS -eq 302 ]; then
             echo "✅ Health check passed! Site is responding with HTTP $HTTP_STATUS"
