@@ -61,13 +61,18 @@ jobs:
 
       - name: Deploy to VPS
         run: |
+          # Normalize deploy path (remove trailing slash) to avoid creating backups under "$DEPLOY_PATH/.backup.*"
+          DEPLOY_PATH="${{ vars.VPS_DEPLOY_PATH }}"
+          DEPLOY_PATH="${DEPLOY_PATH%/}"
+
           # Create backup of current deployment
           echo "Creating backup of current deployment..."
           ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            if [ -d ${{ vars.VPS_DEPLOY_PATH }} ] && [ \$(ls -A ${{ vars.VPS_DEPLOY_PATH }} 2>/dev/null | wc -l) -gt 0 ]; then
-              BACKUP_DIR=${{ vars.VPS_DEPLOY_PATH }}.backup.\$(date +%Y%m%d_%H%M%S)
-              sudo rsync -a --exclude='node_modules' ${{ vars.VPS_DEPLOY_PATH }}/ \"\$BACKUP_DIR\"
-              sudo chown -R ci:ci \"\$BACKUP_DIR\"
+            DEPLOY_PATH='${DEPLOY_PATH}'
+            if [ -d \"\$DEPLOY_PATH\" ] && [ \$(ls -A \"\$DEPLOY_PATH\" 2>/dev/null | wc -l) -gt 0 ]; then
+              BACKUP_DIR=\"\${DEPLOY_PATH}.backup.\$(date +%Y%m%d_%H%M%S)\"
+              sudo rsync -a --exclude='node_modules' \"\$DEPLOY_PATH\"/ \"\$BACKUP_DIR\"
+              sudo chown -R ${{ vars.VPS_USER }}:${{ vars.VPS_USER }} \"\$BACKUP_DIR\"
               echo \"Created backup: \$BACKUP_DIR\"
             fi
           "
@@ -75,7 +80,8 @@ jobs:
           # Clear deployment directory
           echo "Clearing deployment directory..."
           ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            sudo rm -rf ${{ vars.VPS_DEPLOY_PATH }}/*
+            DEPLOY_PATH='${DEPLOY_PATH}'
+            sudo rm -rf \"\$DEPLOY_PATH\"/*
           "
 
           # Upload new build and server files to temporary directory
@@ -92,10 +98,11 @@ jobs:
           # Move files to deployment directory and set proper permissions
           echo "Moving files to deployment directory and setting proper permissions..."
           ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            sudo cp -r ~/temp_deploy/* ${{ vars.VPS_DEPLOY_PATH }}/
-            sudo chown -R www-data:www-data ${{ vars.VPS_DEPLOY_PATH }}
-            sudo find ${{ vars.VPS_DEPLOY_PATH }} -type d -exec chmod 755 {} \;
-            sudo find ${{ vars.VPS_DEPLOY_PATH }} -type f -exec chmod 644 {} \;
+            DEPLOY_PATH='${DEPLOY_PATH}'
+            sudo cp -r ~/temp_deploy/* \"\$DEPLOY_PATH\"/
+            sudo chown -R www-data:www-data \"\$DEPLOY_PATH\"
+            sudo find \"\$DEPLOY_PATH\" -type d -exec chmod 755 {} \;
+            sudo find \"\$DEPLOY_PATH\" -type f -exec chmod 644 {} \;
             rm -rf ~/temp_deploy
           "
 
@@ -103,11 +110,12 @@ jobs:
           # Restart Node.js server
           echo "Restarting Node.js server..."
           ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            DEPLOY_PATH='${DEPLOY_PATH}'
             # Stop existing server if running
             sudo systemctl stop stat-server 2>/dev/null || true
 
             # Install systemd service file (replace placeholder with actual path)
-            sed \"s|{{VPS_DEPLOY_PATH}}|${{ vars.VPS_DEPLOY_PATH }}|g\" ${{ vars.VPS_DEPLOY_PATH }}/stat-server.service | sudo tee /etc/systemd/system/stat-server.service > /dev/null
+            sed \"s|{{VPS_DEPLOY_PATH}}|\$DEPLOY_PATH|g\" \"\$DEPLOY_PATH\"/stat-server.service | sudo tee /etc/systemd/system/stat-server.service > /dev/null
             sudo systemctl daemon-reload
             sudo systemctl enable stat-server
             echo 'Installed and enabled stat-server service'
@@ -124,8 +132,8 @@ jobs:
           # Cleanup old backups (keep only last 3)
           echo "Cleaning up old backups (keeping only last 3)..."
           ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            cd /var/www
-            ls -td ${{ vars.VPS_DEPLOY_PATH }}.backup.* 2>/dev/null | tail -n +4 | xargs -r rm -rf
+            DEPLOY_PATH='${DEPLOY_PATH}'
+            ls -td \"\$DEPLOY_PATH\".backup.* 2>/dev/null | tail -n +4 | xargs -r sudo rm -rf
             echo 'Cleaned up old backups'
           "
 
@@ -145,12 +153,13 @@ jobs:
 
             # Rollback logic
             ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-              BACKUP_DIR=\$(ls -td ${{ vars.VPS_DEPLOY_PATH }}.backup.* 2>/dev/null | head -n1)
+              DEPLOY_PATH='${DEPLOY_PATH}'
+              BACKUP_DIR=\$(ls -td \"\$DEPLOY_PATH\".backup.* 2>/dev/null | head -n1)
               if [ ! -z \"\$BACKUP_DIR\" ] && [ -d \"\$BACKUP_DIR\" ]; then
                 echo \"Found backup directory: \$BACKUP_DIR\"
-                sudo rm -rf ${{ vars.VPS_DEPLOY_PATH }}/*
-                sudo cp -r \"\$BACKUP_DIR\"/* ${{ vars.VPS_DEPLOY_PATH }}/
-                sudo chown -R www-data:www-data ${{ vars.VPS_DEPLOY_PATH }}
+                sudo rm -rf \"\$DEPLOY_PATH\"/*
+                sudo cp -r \"\$BACKUP_DIR\"/* \"\$DEPLOY_PATH\"/
+                sudo chown -R www-data:www-data \"\$DEPLOY_PATH\"
                 sudo systemctl reload nginx
                 echo 'Rollback completed successfully'
               else
