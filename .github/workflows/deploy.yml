@@ -101,8 +101,7 @@ jobs:
             DEPLOY_PATH='${DEPLOY_PATH}'
             sudo cp -r ~/temp_deploy/* \"\$DEPLOY_PATH\"/
             sudo chown -R www-data:www-data \"\$DEPLOY_PATH\"
-            sudo find \"\$DEPLOY_PATH\" -type d -exec chmod 755 {} \;
-            sudo find \"\$DEPLOY_PATH\" -type f -exec chmod 644 {} \;
+            sudo chmod -R u=rwX,go=rX \"\$DEPLOY_PATH\"
             rm -rf ~/temp_deploy
           "
 
