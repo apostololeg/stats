@@ -18,7 +18,7 @@
     "deploy": "rsync -av -e ssh --delete-before --exclude='*.png' build root@188.166.100.18:/var/www/stat/",
     "deployAll": "rsync -av -e ssh build root@188.166.100.18:/var/www/stat/",
     "server:dev": "NODE_ENV=development nodemon --ignore ./config --ignore ./src --exec babel-node server/index.js --inspect",
-    "server:prod": "NODE_ENV=production babel-node server",
+    "server:prod": "NODE_ENV=production babel-node server/index.js",
     "db:admin": "BROWSER=none prisma studio --port 4444",
     "db:reset": "prisma migrate reset --skip-seed",
     "db:push": "prisma db push",
@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@babel/cli": "^7.8.4",
+    "@babel/node": "7.8.7",
     "@babel/plugin-transform-modules-commonjs": "^7.9.0",
     "@babel/runtime-corejs3": "^7.9.2",
     "@homecode/ui": "^4.29.1",
@@ -52,7 +53,6 @@
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.26.0",
     "autoprefixer": "^10.3.4",
-    "babel-node": "^0.0.1-security",
     "babel-plugin-object-to-json-parse": "0.0.8",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-latest": "^6.24.1",
@@ -114,7 +114,6 @@
   "description": "",
   "devDependencies": {
     "@babel/core": "7.9.0",
-    "@babel/node": "7.8.7",
     "@babel/plugin-proposal-class-properties": "7.8.3",
     "@babel/plugin-proposal-decorators": "7.8.3",
     "@babel/plugin-proposal-export-default-from": "7.8.3",
