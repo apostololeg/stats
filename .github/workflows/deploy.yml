@@ -124,6 +124,12 @@ jobs:
               echo 'Upgrading Node.js to 18.x (LTS)...'
               sudo apt-get update -y
               sudo apt-get install -y curl ca-certificates
+              # Some Ubuntu images have distro Node 12 packages (notably libnode-dev) that conflict with NodeSource nodejs.
+              # Purge them first to avoid dpkg overwrite errors (e.g. /usr/include/node/common.gypi).
+              echo 'Removing conflicting distro node packages (if any)...'
+              sudo apt-get remove -y --purge nodejs npm libnode-dev nodejs-doc node-ws || true
+              sudo apt-get autoremove -y || true
+              sudo apt-get -f install -y || true
               curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
               sudo apt-get install -y nodejs
               hash -r || true
