@@ -114,6 +114,23 @@ jobs:
             # Stop existing server if running
             sudo systemctl stop stat-server 2>/dev/null || true
 
+            # Ensure Node.js is new enough for the actual runtime user (www-data).
+            # nvm can be available for the SSH user (e.g. ci) but NOT for www-data,
+            # and yarn install below runs as www-data.
+            echo 'Checking Node.js version for www-data on VPS...'
+            NODE_MAJOR=\$(sudo -u www-data -H bash -lc \"node -p 'process.versions.node.split(\\\".\\\")[0]' 2>/dev/null || echo 0\")
+            echo \"www-data node: \$(sudo -u www-data -H bash -lc 'node -v 2>/dev/null || echo missing')\"
+            if [ \"\$NODE_MAJOR\" -lt 18 ]; then
+              echo 'Upgrading Node.js to 18.x (LTS)...'
+              sudo apt-get update -y
+              sudo apt-get install -y curl ca-certificates
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+              hash -r || true
+              echo \"Upgraded system node: \$(node -v)\"
+              echo \"www-data node after upgrade: \$(sudo -u www-data -H bash -lc 'node -v 2>/dev/null || echo missing')\"
+            fi
+
             # Install dependencies (deploy clears node_modules; service needs babel-node from node_modules/.bin)
             echo 'Installing Node.js dependencies...'
             if ! command -v yarn >/dev/null 2>&1; then
