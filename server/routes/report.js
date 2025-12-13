@@ -1,21 +1,37 @@
 import express from 'express';
 
 import { COOKIE_TOKEN_NAME_CLIENT } from '../../config/const';
-
+import { decodeToken, encodeToken, setCookie } from '../api/auth';
 import db from '../api/db';
-import { encodeToken, decodeToken, setCookie } from '../api/auth';
-
 import throttle from '../tools/throttle';
-import { getClientToken, generateClientId } from '../tools/tokens';
 import { timezoneCity2Country } from '../tools/timezoneCity2Country';
+import { generateClientId, getClientToken } from '../tools/tokens';
 
 // import { adminMiddleware } from './auth';
 
 const router = express.Router();
 
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function normalizeRangeDate(value, { isEnd } = { isEnd: false }) {
+  const str = Array.isArray(value) ? value[0] : value;
+  if (!str || typeof str !== 'string') return null;
+
+  // Frontend sends YYYY-MM-DD (no time). JS parses that as UTC midnight.
+  // For endDate we want the whole day included.
+  const iso = DATE_ONLY_RE.test(str)
+    ? `${str}T${isEnd ? '23:59:59.999' : '00:00:00.000'}Z`
+    : str;
+
+  const d = new Date(iso);
+  // eslint-disable-next-line no-restricted-globals
+  if (isNaN(d.getTime())) return null;
+  return d;
+}
+
 const setProjectUpdated = throttle(
   id => db.project.update({ where: { id }, data: { updatedAt: new Date() } }),
-  1000 * 60 // 1 min
+  1000 * 60, // 1 min
 );
 
 export default router
@@ -64,12 +80,16 @@ export default router
   .get('/', async (req, res) => {
     const { startDate, endDate, pid } = req.query;
 
+    const start = normalizeRangeDate(startDate, { isEnd: false });
+    const end = normalizeRangeDate(endDate, { isEnd: true });
+    if (!pid || !start || !end) return res.status(400).send({ ok: false });
+
     const events = await db.event.findMany({
       where: {
         pid,
         time: {
-          gte: new Date(startDate),
-          lte: new Date(endDate),
+          gte: start,
+          lte: end,
         },
       },
       select: {
@@ -80,8 +100,6 @@ export default router
     });
 
     // Create days array for the date range
-    const start = new Date(startDate);
-    const end = new Date(endDate);
     const daysMap = {};
     const currentDay = new Date(start);
 
@@ -152,7 +170,7 @@ export default router
             total: [],
           },
         },
-      }
+      },
     );
 
     // remove sensitive data, add total
@@ -163,7 +181,7 @@ export default router
         report.totalUsersByCountry += count;
         return acc;
       },
-      {}
+      {},
     );
 
     // Convert the daily data for plotting
@@ -172,7 +190,7 @@ export default router
         date,
         views: Object.values(dayData.pageViews).reduce(
           (sum, count) => sum + count,
-          0
+          0,
         ),
         pages: dayData.pageViews,
       })),
@@ -180,7 +198,7 @@ export default router
         date,
         count: Object.values(dayData.events).reduce(
           (sum, count) => sum + count,
-          0
+          0,
         ),
         events: dayData.events,
       })),

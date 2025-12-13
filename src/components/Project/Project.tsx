@@ -94,12 +94,12 @@ export default function Project({ pathParams: { pid } }) {
   }, [pid]);
 
   useEffect(() => {
-    if (!report) updateReport(dateInterval);
+    if (!report) updateReport();
   }, [pid]);
 
   useEffect(() => {
     if (reportByInterval) setReport(reportByInterval);
-    else updateReport(dateInterval);
+    else updateReport();
   }, [reportByInterval]);
 
   const usersByCountryPlotData = useMemo(() => {
