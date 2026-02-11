@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/apostololeg/stat/compare/v1.2.1...v2.0.0) (2026-02-11)
+
+
+### Bug Fixes
+
+* **ci:** avoid find -exec in deploy chmod ([079a81a](https://github.com/apostololeg/stat/commit/079a81a0122f879c7b43047b10da6219f2c05414))
+* **ci:** normalize deploy path for backup cleanup ([2201db8](https://github.com/apostololeg/stat/commit/2201db85a91f4eca5cd627ba446f5fa6ceb18d00))
+* **deploy:** avoid empty DEPLOY_PATH in www-data yarn install ([3d760cc](https://github.com/apostololeg/stat/commit/3d760ccb54a7c7aaac6e0278832f76270c986a67))
+* **deploy:** ensure www-data uses Node 18+ ([42dfe2b](https://github.com/apostololeg/stat/commit/42dfe2b245228e95682e4b06a969e7d287c11af0))
+* **deploy:** install devDependencies for babel-node runtime ([edf07ac](https://github.com/apostololeg/stat/commit/edf07acea1c48954154fd006a59b251db93fbab4))
+* **deploy:** purge libnode-dev before installing NodeSource nodejs ([3956d09](https://github.com/apostololeg/stat/commit/3956d0932c1d80631a5fda9c57d796ad61e5d8ec))
+* **deploy:** set writable yarn/npm caches for www-data ([581bf5d](https://github.com/apostololeg/stat/commit/581bf5d1b4c3b9a30fbf812237036bf28d41404c))
+* **report:** include full-day date range in report queries ([4bd3aa7](https://github.com/apostololeg/stat/commit/4bd3aa77f1af6509f4ea6031dc97eec3af1f1410))
+* CI - deployment deps and dirs ([ad82368](https://github.com/apostololeg/stat/commit/ad8236833042baa24df88c84d27fa5dd0e863494))
+* CI - no /config and /shared ([e639375](https://github.com/apostololeg/stat/commit/e63937530ae60f2ac87d527e030fd000b284b371))
+* client/launcher - await for DOMContentLoaded ([def12d3](https://github.com/apostololeg/stat/commit/def12d3814db7f18962ec3837a44c7171d8ac693))
+* Deploy - env variables usage ([25acdc4](https://github.com/apostololeg/stat/commit/25acdc4670014e7c6a127f8a53de19be1859382e))
+* deploy - exclude /config and /shared ([388206d](https://github.com/apostololeg/stat/commit/388206df746c6dfdebd90dcb66ea7c53b8b10331))
+* Deploy script - build:prod ([21b8546](https://github.com/apostololeg/stat/commit/21b85462b4f9e6027973b5a271822f730e56e6d5))
+* deploy server files and restart server after deployment ([c6e8ef9](https://github.com/apostololeg/stat/commit/c6e8ef9685681a018c81ea4e180fa8bba0e737a4))
+* ensure VPS installs deps before starting service ([9e855a1](https://github.com/apostololeg/stat/commit/9e855a1b935d0c7ad8b0c39399e3176488838fc7))
+* resolve systemd service yarn script execution issue ([488d7d2](https://github.com/apostololeg/stat/commit/488d7d247396ce5cb53c82442e2250884bf938bb))
+* restore prod server start ([6256cc2](https://github.com/apostololeg/stat/commit/6256cc2eb51334d32036d4c86d9dd2eeafc6f3bc))
+* use babel-node directly in systemd service instead of yarn ([265746b](https://github.com/apostololeg/stat/commit/265746b70b139bd304424dd2d9404f371f513d9c))
+
 ### [1.2.1](https://github.com/apostololeg/stat/compare/v1.2.0...v1.2.1) (2025-09-21)
 
 ## [1.2.0](https://github.com/apostololeg/stat/compare/v1.1.0...v1.2.0) (2025-09-21)
