@@ -26,6 +26,8 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build project
+        env:
+          DOMAIN: ${{ secrets.DOMAIN }}
         run: yarn build:prod
 
       - name: Setup SSH
