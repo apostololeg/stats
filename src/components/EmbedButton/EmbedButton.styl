@@ -4,10 +4,10 @@
 
 .content
   display flex
-  align-items center
+  flex-direction column
   gap 4px
 
-  max-width 300px
+  max-width 400px
   padding var(--indent-s)
 
   font-size 14px
@@ -15,15 +15,24 @@
 
   pre
     text-wrap wrap
+    font-size 12px
+    opacity .6
+    max-height 100px
+    overflow-y auto
+    overflow-x hidden
 
-  button
-    background-color var(--decent-color)
-    backdrop-filter: blur(10px)
+
+  pre button
+    // backdrop-filter: blur(10px)
+    background-color var(--active-color-alpha-800)
     position absolute
     right 3px
     bottom 3px
     opacity 0
     transition opacity 0.1s ease-out
+
+    &:hover
+      background-color var(--active-color)
 
   &:hover button
     opacity 1

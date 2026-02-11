@@ -1,1 +1,5 @@
-<script src="https://stats.apostol.space/api/client?pid=cljb8hkxt0000mlgndvbgusyz"></script>
+<script>
+  fetch('/sdk/stats.min.js')
+    .then(r => r.text())
+    .then(t => eval(t.replace(/{PID}/g, 'cljb8hkxt0000mlgndvbgusyz')));
+</script>

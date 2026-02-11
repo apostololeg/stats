@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
-import { isAdmin, setCookie, encodeToken } from '../api/auth';
-
-import { SESSION_EXPIRED_AFTER, COOKIE_TOKEN_NAME } from '../../config/const';
+import {
+  COOKIE_TOKEN_NAME,
+  PRODUCTION,
+  SESSION_EXPIRED_AFTER,
+} from '../../config/const';
+import { encodeToken, isAdmin, setCookie } from '../api/auth';
 
 const router = Router();
 
 export const adminMiddleware = (req, res, next) => {
+  if (!PRODUCTION) return next();
   if (!isAdmin(req)) return res.status(403).send('Forbidden');
   next();
 };
@@ -21,7 +25,7 @@ export default router.get('/:key', (req, res) => {
   setCookie(
     res,
     COOKIE_TOKEN_NAME,
-    encodeToken({ key }, { expiresIn: SESSION_EXPIRED_AFTER })
+    encodeToken({ key }, { expiresIn: SESSION_EXPIRED_AFTER }),
   );
 
   res.redirect('/');

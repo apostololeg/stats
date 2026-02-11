@@ -1,11 +1,10 @@
 import express from 'express';
 
-import { COOKIE_TOKEN_NAME_CLIENT } from '../../config/const';
-import { decodeToken, encodeToken, setCookie } from '../api/auth';
+import { decodeToken, encodeToken } from '../api/auth';
 import db from '../api/db';
 import throttle from '../tools/throttle';
 import { timezoneCity2Country } from '../tools/timezoneCity2Country';
-import { generateClientId, getClientToken } from '../tools/tokens';
+import { generateClientId } from '../tools/tokens';
 
 // import { adminMiddleware } from './auth';
 
@@ -37,28 +36,22 @@ const setProjectUpdated = throttle(
 export default router
   .post('/', async (req, res) => {
     const data = req.body;
-
-    let { cid } = decodeToken(getClientToken(req)) ?? {};
     const pid = data.pid;
 
-    // first report
+    let { cid } = decodeToken(data.token) ?? {};
+    let isNewToken = false;
+
     if (!cid && pid) {
-      // check if project exists
       const count = await db.project.count({ where: { id: pid } });
       if (!count) return res.json(null);
-
-      // generate cid
       cid = generateClientId();
-      setCookie(res, COOKIE_TOKEN_NAME_CLIENT, encodeToken({ cid }));
+      isNewToken = true;
     }
-
-    console.log('----report', data, cid);
 
     if (!cid || !pid || (!data.page && !data.event))
       return res.status(400).send({ ok: false });
 
     const country = timezoneCity2Country(data.timeZone ?? '');
-
     if (country) {
       data.country = country;
       delete data.timeZone;
@@ -74,7 +67,11 @@ export default router
 
     setProjectUpdated();
 
-    res.status(200).send({ ok: true });
+    if (isNewToken) {
+      res.status(200).json({ token: encodeToken({ cid }) });
+    } else {
+      res.sendStatus(200);
+    }
   })
 
   .get('/', async (req, res) => {

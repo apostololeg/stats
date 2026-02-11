@@ -14,7 +14,9 @@
   },
   "scripts": {
     "build:dev": "NODE_ENV=development webpack --mode=development --config ./config/webpack/dev.js --progress",
-    "build:prod": "NODE_ENV=production webpack --mode=production --config ./config/webpack/prod.js --progress && ln -sf uploads build/uploads",
+    "build:prod": "NODE_ENV=production webpack --mode=production --config ./config/webpack/prod.js --progress && yarn build:sdk && ln -sf uploads build/uploads",
+    "build:sdk": "NODE_ENV=production webpack --config ./config/webpack/sdk.js",
+    "build:sdk:dev": "NODE_ENV=development webpack --config ./config/webpack/sdk.js --mode=development",
     "deploy": "rsync -av -e ssh --delete-before --exclude='*.png' build root@188.166.100.18:/var/www/stat/",
     "deployAll": "rsync -av -e ssh build root@188.166.100.18:/var/www/stat/",
     "server:dev": "NODE_ENV=development nodemon --ignore ./config --ignore ./src --exec babel-node server/index.js --inspect",

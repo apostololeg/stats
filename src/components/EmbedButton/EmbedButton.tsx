@@ -1,22 +1,27 @@
 import { Button, Icon, Popup } from '@homecode/ui';
 import cn from 'classnames';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import S from './EmbedButton.styl';
 
 export default function EmbedButton({ pid }: { pid: string }) {
   const [isCopied, setIsCopied] = useState(false);
-  const code = `<script src="https://stats.apostol.space/api/client?pid=${pid}"></script>`;
+  const [sdkCode, setSdkCode] = useState<string>('');
+
+  useEffect(() => {
+    fetch('/sdk/stats.min.js')
+      .then(res => res.text())
+      .then(code => setSdkCode(code.replace(/__STATS_PID__/g, pid)))
+      .catch(() => setSdkCode(''));
+  }, []);
 
   const copyToClipboard = () => {
-    if (isCopied) return;
+    if (isCopied || !sdkCode) return;
 
     try {
-      navigator.clipboard.writeText(code);
+      navigator.clipboard.writeText(sdkCode);
       setIsCopied(true);
-      setTimeout(() => {
-        setIsCopied(false);
-      }, 3000);
+      setTimeout(() => setIsCopied(false), 3000);
     } catch (error) {
       console.error(error);
     }
@@ -33,19 +38,21 @@ export default function EmbedButton({ pid }: { pid: string }) {
           Embed
         </Button>
       }
-      // triggerProps={{ className: S.trigger }}
       contentProps={{ className: cn(S.content, isCopied && S.isCopied) }}
       content={
         <pre>
-          {code}
-          <Button size="s" square={!isCopied} onClick={copyToClipboard}>
+          {sdkCode}
+          <Button size="s" onClick={copyToClipboard}>
             {isCopied ? (
               <>
-                Copied&nbsp;
+                Copied&nbsp;&nbsp;
                 <Icon type="check" size="s" />
               </>
             ) : (
-              <Icon type="copy" size="s" />
+              <>
+                Copy&nbsp;&nbsp;
+                <Icon type="copy" size="s" />
+              </>
             )}
           </Button>
         </pre>
