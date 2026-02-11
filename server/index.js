@@ -1,37 +1,31 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import methodOverride from 'method-override';
-import session from 'express-session';
 import compression from 'compression';
-// import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express from 'express';
+import session from 'express-session';
+import methodOverride from 'method-override';
 
-import { PRODUCTION, SERVER_PORT, JWT_SECRET } from '../config/const';
-
-// import db from './api/db';
+import { JWT_SECRET, PRODUCTION, SERVER_PORT } from '../config/const';
+import { isAllowedOrigin } from './middlewares/allowedOrigins';
 import routes from './routes';
 
 const app = express();
 
 if (PRODUCTION) {
-  // const allowedOrigins = [];
-  // db.project.findMany().then(projects => {
-  //   allowedOrigins.push(...projects.map(p => p.domain));
-  // });
-  // app.use(
-  //   cors({
-  //     origin: function (origin, callback) {
-  //       console.log('===origin', origin);
-  //       if (!origin && allowedOrigins.includes(origin)) {
-  //         callback(null, true);
-  //       } else {
-  //         callback(new Error('Not allowed by CORS'));
-  //       }
-  //     },
-  //     optionsSuccessStatus: 200,
-  //     credentials: true,
-  //   })
-  // );
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (isAllowedOrigin(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      optionsSuccessStatus: 200,
+      credentials: true,
+    }),
+  );
 }
 
 app.use(compression());
