@@ -13,7 +13,7 @@ export default function EmbedButton({ pid }: { pid: string }) {
       .then(res => res.text())
       .then(code => setSdkCode(code.replace(/__STATS_PID__/g, pid)))
       .catch(() => setSdkCode(''));
-  }, []);
+  }, [pid]);
 
   const copyToClipboard = () => {
     if (isCopied || !sdkCode) return;
