@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/apostololeg/stat/compare/v2.0.0...v2.0.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* config - DOMAIN undefined in CI build ([2d3b693](https://github.com/apostololeg/stat/commit/2d3b693ac3ec88654aaa4ca5282174d531a44bc7))
+* EmbedButton - Refresh embed snippet when project changes ([f2c441f](https://github.com/apostololeg/stat/commit/f2c441fae9e898deb6c8c6649af1db40b4596d22))
+* Server - Enable CORS for allowed origins ([639f552](https://github.com/apostololeg/stat/commit/639f55221b710b120f6bf89b3ecb42cffb004751))
+
 ## [2.0.0](https://github.com/apostololeg/stat/compare/v1.2.1...v2.0.0) (2026-02-11)
 
 
