@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.2](https://github.com/apostololeg/stat/compare/v2.0.1...v2.0.2) (2026-05-29)
+
+
+### Features
+
+* LiveEvents - Link projects and live status polish ([6375deb](https://github.com/apostololeg/stat/commit/6375debc34d6af2bb34d6b583e22ff6ccf45254b))
+* LiveEvents - Real-time live feed and responsive layout ([6ca6474](https://github.com/apostololeg/stat/commit/6ca6474e76987d589ccd8f2c1136f3d9a71d3b29))
+
+
+### Bug Fixes
+
+* LiveEvents - Mobile table column overlap ([d637992](https://github.com/apostololeg/stat/commit/d637992c5f60042172e3458aaf73643148d7c9f9))
+
 ### [2.0.1](https://github.com/apostololeg/stat/compare/v2.0.0...v2.0.1) (2026-04-13)
 
 
