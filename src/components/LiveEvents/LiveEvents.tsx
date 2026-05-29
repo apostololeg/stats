@@ -134,7 +134,7 @@ export default function LiveEvents() {
 
       {tableData.length > 0 ? (
         <div className={S.tableWrap}>
-          <Table columns={COLUMNS} data={tableData} />
+          <Table className={S.table} columns={COLUMNS} data={tableData} />
         </div>
       ) : (
         <p className={S.empty}>No live events yet</p>

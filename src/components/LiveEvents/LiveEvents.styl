@@ -29,10 +29,23 @@ json('../../constants/layoutBreakpoints.json')
   min-height 320px
   margin-top var(--indent-s)
   width 100%
+  overflow hidden
+
+  > div
+    height 100%
+    border-radius 14px
+    overflow hidden
+
+    > div:first-child
+      height 100%
 
   table
     border-collapse collapse
     border-spacing 0
+
+  thead
+    background-color var(--decent-color-alpha-900)
+    backdrop-filter blur(10px)
 
   th,
   td
@@ -81,6 +94,10 @@ json('../../constants/layoutBreakpoints.json')
   opacity 0.6
   margin-top var(--indent-s)
 
+.table
+  border-radius 14px
+  overflow hidden
+
 @media screen and (max-width: unit(MOBILE, 'px'))
   .tableWrap
     width 100%
@@ -88,34 +105,9 @@ json('../../constants/layoutBreakpoints.json')
     overflow-x auto
     -webkit-overflow-scrolling touch
 
-    table
-      width 100%
-      table-layout fixed
+  .table
+    overflow visible
 
-    th,
-    td
-      min-width 0
-
-    th:nth-child(1),
-    td:nth-child(1)
-      width 18%
-
-    th:nth-child(2),
-    td:nth-child(2)
-      width 10%
-
-    th:nth-child(3),
-    td:nth-child(3)
-      width 22%
-
-    th:nth-child(4),
-    td:nth-child(4)
-      width 12%
-
-    th:nth-child(5),
-    td:nth-child(5)
-      width 24%
-
-    th:nth-child(6),
-    td:nth-child(6)
-      width 14%
+  .tableWrap table
+    width max-content
+    min-width 100%
