@@ -1,16 +1,18 @@
 import jwt from 'jsonwebtoken';
 
 import {
-  PRODUCTION,
-  JWT_SECRET,
-  COOKIE_TOKEN_NAME,
   ADMIN_KEY,
+  COOKIE_TOKEN_NAME,
+  JWT_SECRET,
+  PRODUCTION,
 } from '../../config/const';
 import { getAuthToken } from '../tools/tokens';
 
 const COOKIE_OPTS = {
   httpOnly: true,
   secure: PRODUCTION,
+  path: '/',
+  sameSite: 'lax',
 };
 
 export const encodeToken = (data, params = {}) =>

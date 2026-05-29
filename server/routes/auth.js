@@ -15,18 +15,24 @@ export const adminMiddleware = (req, res, next) => {
   next();
 };
 
-export default router.get('/:key', (req, res) => {
-  const { key } = req.params;
+export default router
+  .get('/check', (req, res) => {
+    if (!isAdmin(req)) return res.status(403).send('Forbidden');
+    res.json({ ok: true });
+  })
 
-  if (key !== process.env.ADMIN_KEY) {
-    return res.status(403).send('Forbidden');
-  }
+  .get('/:key', (req, res) => {
+    const { key } = req.params;
 
-  setCookie(
-    res,
-    COOKIE_TOKEN_NAME,
-    encodeToken({ key }, { expiresIn: SESSION_EXPIRED_AFTER }),
-  );
+    if (key !== process.env.ADMIN_KEY) {
+      return res.status(403).send('Forbidden');
+    }
 
-  res.redirect('/');
-});
+    setCookie(
+      res,
+      COOKIE_TOKEN_NAME,
+      encodeToken({ key }, { expiresIn: SESSION_EXPIRED_AFTER }),
+    );
+
+    res.redirect('/');
+  });

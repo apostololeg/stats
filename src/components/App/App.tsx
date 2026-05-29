@@ -8,7 +8,7 @@ import Routes from 'components/Routes/Routes';
 import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
 import { useStore } from 'justorm/react';
 import live from 'store/live';
-import { useUser } from 'store/user';
+import user, { useUser } from 'store/user';
 
 import S from './App.styl';
 
@@ -26,11 +26,17 @@ export default function App() {
   });
 
   useEffect(() => {
+    user.init();
+  }, []);
+
+  useEffect(() => {
+    if (!user.isInited) return;
+
     if (user.isLogged) live.connect();
     else live.disconnect();
 
     return () => live.disconnect();
-  }, [user.isLogged]);
+  }, [user.isInited, user.isLogged]);
 
   return (
     <>
