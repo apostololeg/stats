@@ -1,4 +1,4 @@
-import { DateTime, Table } from '@homecode/ui';
+import { DateTime, Link, Table } from '@homecode/ui';
 import cn from 'classnames';
 import { useMemo } from 'react';
 
@@ -54,11 +54,18 @@ const COLUMNS = [
     label: 'Project',
     render: ({ projectName, pid }: LiveEventRow) => {
       const isRawPid = projectName === pid;
+      const label = isRawPid ? truncateId(projectName) : projectName;
 
       return (
-        <span className={S.cellEllipsis} title={projectName}>
-          {isRawPid ? truncateId(projectName) : projectName}
-        </span>
+        <Link
+          href={`/project/${pid}`}
+          className={S.projectLink}
+          title={projectName}
+          isClear
+          inline
+        >
+          {label}
+        </Link>
       );
     },
   },

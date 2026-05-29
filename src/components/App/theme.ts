@@ -1,4 +1,4 @@
-import { ThemeHelpers, ThemeDefaults } from '@homecode/ui';
+import { ThemeDefaults, ThemeHelpers } from '@homecode/ui';
 
 const { colors, getColors, getConfig } = ThemeDefaults;
 
@@ -45,6 +45,10 @@ export function getThemeConfig(theme: 'dark' | 'light', activeColor: string) {
         color: activeColor, // update activeColor
         // @ts-ignore
         mods: activeColoMods, // save activeColor mods
+      },
+      success: {
+        color: '#22c55e',
+        mods: { alpha: [100, 300, 500] },
       },
     }),
   };

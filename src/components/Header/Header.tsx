@@ -1,11 +1,12 @@
-import { useCallback, useState } from 'react';
-import { useStore } from 'justorm/react';
 import { Button, Input, debounce } from '@homecode/ui';
 import cn from 'classnames';
+import { useCallback, useState } from 'react';
 
-import S from './Header.styl';
 import Logo from 'components/Logo/Logo';
 import BREAKPOINTS from 'constants/layoutBreakpoints.json';
+import { useStore } from 'justorm/react';
+
+import S from './Header.styl';
 
 type Props = {
   store?: any;

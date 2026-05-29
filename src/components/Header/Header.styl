@@ -25,6 +25,30 @@ json('../../constants/layoutBreakpoints.json')
     color var(--accent-color) !important
     transform scale(1.5)
 
+.headerRow
+  display flex
+  align-items center
+  width 100%
+  gap var(--indent-s)
+
+.liveStatus
+  flex-shrink 0
+  font-size 80%
+  padding 2px 8px
+  border-radius 999px
+  background-color var(--accent-color-alpha-50)
+
+  &.connected
+    width 12px
+    height 12px
+    padding 0
+    background-color var(--success-color-alpha-100, var(--accent-color-alpha-100))
+    box-shadow 0 0 0 2px var(--success-color-alpha-500, var(--accent-color-alpha-500))
+
+  &.disconnected,
+  &.connecting
+    background-color var(--warning-color-alpha-100, var(--accent-color-alpha-100))
+
 .titleGap
 .title
   padding 0 20px

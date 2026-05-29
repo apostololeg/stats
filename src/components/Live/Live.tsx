@@ -13,7 +13,6 @@ export default function Live() {
 
   return (
     <Container className={S.root}>
-      <h1>Live events</h1>
       <LiveEvents />
     </Container>
   );
