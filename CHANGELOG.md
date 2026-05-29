@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.3](https://github.com/apostololeg/stat/compare/v2.0.2...v2.0.3) (2026-05-29)
+
+
+### Bug Fixes
+
+* LIve - project links ([d8c15f1](https://github.com/apostololeg/stat/commit/d8c15f1e1e836bc4b1d819ae93dd97c7747d60b7))
+
 ### [2.0.2](https://github.com/apostololeg/stat/compare/v2.0.1...v2.0.2) (2026-05-29)
 
 
