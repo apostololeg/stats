@@ -54,7 +54,7 @@ const STORE = createStore('live', {
         const msg = JSON.parse(data as string) as LiveMessage;
 
         if (msg.type === 'history') {
-          this.events = msg.events.slice(-MAX_EVENTS);
+          this.events = msg.events.slice(0, MAX_EVENTS);
         } else if (msg.type === 'event') {
           this.events = [msg.event, ...this.events].slice(0, MAX_EVENTS);
         }

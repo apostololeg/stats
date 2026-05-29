@@ -46,7 +46,7 @@ async function sendHistory(ws) {
   ws.send(
     JSON.stringify({
       type: 'history',
-      events: events.reverse().map(serializeEvent),
+      events: events.map(serializeEvent),
     }),
   );
 }
