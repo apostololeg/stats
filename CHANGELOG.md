@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.4](https://github.com/apostololeg/stat/compare/v2.0.3...v2.0.4) (2026-05-29)
+
+
+### Bug Fixes
+
+* Live - Validate session before WebSocket connect ([6f6689b](https://github.com/apostololeg/stat/commit/6f6689b52a15be24f12a4249dcf7507fce1666f6))
+* LiveEvents - Show newest events first ([fb62017](https://github.com/apostololeg/stat/commit/fb62017ded9abb30cd99e2f38aa21e3fd01985cb))
+
 ### [2.0.3](https://github.com/apostololeg/stat/compare/v2.0.2...v2.0.3) (2026-05-29)
 
 
