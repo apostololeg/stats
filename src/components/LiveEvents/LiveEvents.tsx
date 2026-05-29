@@ -58,7 +58,7 @@ const COLUMNS = [
 
       return (
         <Link
-          href={`/project/${pid}`}
+          href={`//project/${pid}`}
           className={S.projectLink}
           title={projectName}
           isClear
