@@ -46,6 +46,12 @@ module.exports = merge(common, {
     historyApiFallback: true,
     port: DEV_PORT,
     proxy: {
+      '/api/live': {
+        target: PRODUCTION ? `${DOMAIN}/` : `http://localhost:${SERVER_PORT}/`,
+        ws: true,
+        changeOrigin: true,
+        secure: false,
+      },
       '/api': proxyConfig,
     },
   },

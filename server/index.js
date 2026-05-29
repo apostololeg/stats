@@ -4,9 +4,11 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
+import http from 'http';
 import methodOverride from 'method-override';
 
 import { JWT_SECRET, PRODUCTION, SERVER_PORT } from '../config/const';
+import { setupLiveWs } from './live/ws';
 import { isAllowedOrigin } from './middlewares/allowedOrigins';
 import routes from './routes';
 
@@ -36,6 +38,10 @@ app.use(session({ secret: JWT_SECRET, resave: true, saveUninitialized: true }));
 
 routes(app);
 
-app.listen({ port: SERVER_PORT }, () => {
+const server = http.createServer(app);
+
+setupLiveWs(server);
+
+server.listen({ port: SERVER_PORT }, () => {
   console.log(`\n  🚀  App ready on port ${SERVER_PORT}\n`);
 });

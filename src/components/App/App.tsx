@@ -1,10 +1,14 @@
 import { Checkbox, Notifications, Scroll, Theme, VH, dom } from '@homecode/ui';
 import cn from 'classnames';
+import { useEffect } from 'react';
 
 import Header from 'components/Header/Header';
 import ProjectsList from 'components/ProjectsList/ProjectsList';
 import Routes from 'components/Routes/Routes';
+import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
 import { useStore } from 'justorm/react';
+import live from 'store/live';
+import { useUser } from 'store/user';
 
 import S from './App.styl';
 
@@ -15,10 +19,18 @@ require('./store');
 dom.watchControllerFlag();
 
 export default function App() {
+  const user = useUser(['isLogged']);
   const { app } = useStore({
     app: ['theme', 'isSidebarOpen'],
     projects: [],
   });
+
+  useEffect(() => {
+    if (user.isLogged) live.connect();
+    else live.disconnect();
+
+    return () => live.disconnect();
+  }, [user.isLogged]);
 
   return (
     <>
@@ -35,6 +47,16 @@ export default function App() {
             autoHide
             fadeSize="l"
           >
+            {user.isLogged && (
+              <ButtonLink
+                href="/live"
+                className={cn(S.listItem, S.sidebarLiveLink)}
+                size="l"
+                onClick={app.toggleSidebar}
+              >
+                Live
+              </ButtonLink>
+            )}
             <ProjectsList
               itemProps={{
                 className: S.listItem,

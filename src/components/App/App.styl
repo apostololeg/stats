@@ -36,6 +36,9 @@ body
   & + &
     margin-top var(--indent-s)
 
+.sidebarLiveLink
+  margin-bottom var(--indent-s)
+
 .darkThemeCheckbox
   position relative
   display flex
@@ -62,6 +65,7 @@ body
 .content
   position relative
   flex-grow 1
+  min-width 0
 
 .version
   position absolute
@@ -90,3 +94,4 @@ body
 
   .content
     padding-top 80px
+    overflow-x hidden

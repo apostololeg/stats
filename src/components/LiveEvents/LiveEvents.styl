@@ -1,0 +1,114 @@
+json('../../constants/layoutBreakpoints.json')
+
+.root
+  margin-top 0
+  min-width 0
+  max-width 100%
+
+.header
+  display flex
+  align-items center
+  margin-bottom var(--indent-s)
+
+.status
+  font-size 80%
+  padding 2px 8px
+  border-radius 999px
+  background-color var(--accent-color-alpha-50)
+
+  &.connected
+    background-color var(--success-color-alpha-100, var(--accent-color-alpha-100))
+
+  &.disconnected,
+  &.connecting
+    background-color var(--warning-color-alpha-100, var(--accent-color-alpha-100))
+
+.tableWrap
+  height calc(100 * var(--vh) - 280px)
+  min-height 320px
+  margin-top var(--indent-s)
+  width 100%
+
+  table
+    border-collapse collapse
+    border-spacing 0
+
+  th,
+  td
+    border none
+
+  th:nth-child(1),
+  td:nth-child(1)
+    min-width 7.5em
+    white-space nowrap
+
+  th:nth-child(2),
+  td:nth-child(2)
+    min-width 5em
+
+  th:nth-child(3),
+  td:nth-child(3)
+    min-width 8em
+
+  th:nth-child(4),
+  td:nth-child(4)
+    min-width 4.5em
+    white-space nowrap
+
+  th:nth-child(5),
+  td:nth-child(5)
+    min-width 6em
+
+  th:nth-child(6),
+  td:nth-child(6)
+    min-width 4.5em
+    white-space nowrap
+
+.cellEllipsis
+  display block
+  overflow hidden
+  text-overflow ellipsis
+  white-space nowrap
+
+.empty
+  opacity 0.6
+  margin-top var(--indent-s)
+
+@media screen and (max-width: unit(MOBILE, 'px'))
+  .tableWrap
+    width 100%
+    max-width 100%
+    overflow-x auto
+    -webkit-overflow-scrolling touch
+
+    table
+      width 100%
+      table-layout fixed
+
+    th,
+    td
+      min-width 0
+
+    th:nth-child(1),
+    td:nth-child(1)
+      width 18%
+
+    th:nth-child(2),
+    td:nth-child(2)
+      width 10%
+
+    th:nth-child(3),
+    td:nth-child(3)
+      width 22%
+
+    th:nth-child(4),
+    td:nth-child(4)
+      width 12%
+
+    th:nth-child(5),
+    td:nth-child(5)
+      width 24%
+
+    th:nth-child(6),
+    td:nth-child(6)
+      width 14%

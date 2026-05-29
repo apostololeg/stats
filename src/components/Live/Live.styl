@@ -1,0 +1,15 @@
+json('../../constants/layoutBreakpoints.json')
+
+.root h1
+  display flex
+  align-items center
+  gap var(--indent-s)
+
+@media screen and (max-width: unit(MOBILE, 'px'))
+  .root h1
+    position sticky
+    top 0
+    z-index 1
+    min-height 60px
+    margin-bottom var(--indent-s)
+    background-color var(--decent-color-alpha-900)

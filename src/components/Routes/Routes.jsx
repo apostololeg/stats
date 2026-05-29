@@ -1,6 +1,6 @@
-import { useStore } from 'justorm/react';
+import { Lazy, Redirect, Route, Router } from '@homecode/ui';
 
-import { Router, Route, Redirect, Lazy } from '@homecode/ui';
+import { useStore } from 'justorm/react';
 
 import NoMatch from './NoMatch';
 
@@ -25,6 +25,12 @@ export default function Routes() {
         path="/project/:pid"
         component={Lazy}
         loader={() => import('components/Project/Project')}
+      />
+
+      <Route
+        path="/live"
+        component={Lazy}
+        loader={() => import('components/Live/Live')}
       />
 
       <Route component={NoMatch} />

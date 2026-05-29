@@ -2,6 +2,7 @@ import express from 'express';
 
 import { decodeToken, encodeToken } from '../api/auth';
 import db from '../api/db';
+import { broadcastLiveEvent } from '../live/ws';
 import throttle from '../tools/throttle';
 import { timezoneCity2Country } from '../tools/timezoneCity2Country';
 import { generateClientId } from '../tools/tokens';
@@ -57,13 +58,15 @@ export default router
       delete data.timeZone;
     }
 
-    await db.event.create({
+    const created = await db.event.create({
       data: {
         cid,
         project: { connect: { id: pid } },
         data,
       },
     });
+
+    broadcastLiveEvent(created);
 
     setProjectUpdated();
 
