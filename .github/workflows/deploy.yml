@@ -56,14 +56,43 @@ jobs:
           envs: DEPLOY_PATH
           script: |
             set -e
-            mkdir -p "$DEPLOY_PATH"
+
+            # Parent dir (e.g. /var/www) is root-owned on a fresh VPS
+            sudo mkdir -p "$DEPLOY_PATH"
+            sudo chown "$USER:$USER" "$DEPLOY_PATH"
+
             TMP_DIR=$(mktemp -d)
             tar -xzf /tmp/deploy.tar.gz -C "$TMP_DIR"
+
+            # rsync is not guaranteed on a fresh/minimal VPS
+            if ! command -v rsync >/dev/null 2>&1; then
+              sudo apt-get update -y
+              sudo apt-get install -y rsync
+            fi
 
             # Server runs via systemd as www-data (see .github/systemd/stat-server.service)
             sudo rsync -a --exclude=uploads "$TMP_DIR"/ "$DEPLOY_PATH"/
             sudo chown -R www-data:www-data "$DEPLOY_PATH"
             rm -rf "$TMP_DIR" /tmp/deploy.tar.gz
+
+            # Fresh VPS bootstrap: Node.js >= 18 for the www-data runtime
+            NODE_MAJOR=$(sudo -u www-data -H bash -lc 'node -v 2>/dev/null' | sed 's/^v//;s/\..*//')
+            if [ "${NODE_MAJOR:-0}" -lt 18 ]; then
+              echo 'Installing Node.js 18.x (NodeSource)...'
+              sudo apt-get update -y
+              sudo apt-get install -y curl ca-certificates
+              sudo apt-get remove -y --purge nodejs npm libnode-dev nodejs-doc || true
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+
+            # Fresh VPS bootstrap: working yarn for www-data. A corepack shim may exist
+            # but fail at runtime if the VPS cannot download the pinned yarn tarball.
+            if ! sudo -u www-data -H bash -lc 'yarn --version' >/dev/null 2>&1; then
+              echo 'Installing yarn globally via npm...'
+              sudo corepack disable 2>/dev/null || true
+              sudo npm install -g yarn
+            fi
 
             # babel-node runtime needs devDependencies -> full install
             sudo -u www-data -H bash -lc "cd '$DEPLOY_PATH' && \
@@ -73,7 +102,7 @@ jobs:
               export YARN_PRODUCTION=false && \
               yarn install --frozen-lockfile --non-interactive --no-progress --production=false"
 
-            # Install/update systemd unit and restart
+            # Install/update systemd unit and restart (creates the unit on a fresh VPS)
             sed "s|{{VPS_DEPLOY_PATH}}|$DEPLOY_PATH|g" "$DEPLOY_PATH/.github/systemd/stat-server.service" | sudo tee /etc/systemd/system/stat-server.service > /dev/null
             sudo systemctl daemon-reload
             sudo systemctl enable stat-server
