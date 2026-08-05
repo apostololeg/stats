@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.2](https://github.com/apostololeg/stat/compare/v2.1.1...v2.1.2) (2026-08-05)
+
+
+### Features
+
+* Deploy - Provision postgres and run migrations ([981cb20](https://github.com/apostololeg/stat/commit/981cb2047dfddb396f3ae41028f5543e85cd7fe4))
+
+
+### Bug Fixes
+
+* Deploy - Systemd unit install on fresh VPS ([8759ed0](https://github.com/apostololeg/stat/commit/8759ed04db12ba0f63624e14043e70952112f59e))
+
 ### [2.1.1](https://github.com/apostololeg/stat/compare/v2.1.0...v2.1.1) (2026-08-05)
 
 ## [2.1.0](https://github.com/apostololeg/stat/compare/v2.0.6...v2.1.0) (2026-08-05)
