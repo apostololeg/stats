@@ -55,7 +55,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           envs: DEPLOY_PATH
           script: |
-            set -e
+            set -euo pipefail
 
             # Parent dir (e.g. /var/www) is root-owned on a fresh VPS
             sudo mkdir -p "$DEPLOY_PATH"
@@ -103,7 +103,9 @@ jobs:
               yarn install --frozen-lockfile --non-interactive --no-progress --production=false"
 
             # Install/update systemd unit and restart (creates the unit on a fresh VPS)
-            sed "s|{{VPS_DEPLOY_PATH}}|$DEPLOY_PATH|g" "$DEPLOY_PATH/.github/systemd/stat-server.service" | sudo tee /etc/systemd/system/stat-server.service > /dev/null
+            # Unmask first: a masked unit is a /dev/null symlink, so tee would silently discard the unit
+            sudo systemctl unmask stat-server.service 2>/dev/null || true
+            sudo sed "s|{{VPS_DEPLOY_PATH}}|$DEPLOY_PATH|g" "$DEPLOY_PATH/.github/systemd/stat-server.service" | sudo tee /etc/systemd/system/stat-server.service > /dev/null
             sudo systemctl daemon-reload
             sudo systemctl enable stat-server
             sudo systemctl restart stat-server
