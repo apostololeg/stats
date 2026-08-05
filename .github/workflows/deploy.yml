@@ -1,12 +1,12 @@
-name: Deploy to VPS
+name: Deploy
 
 on:
   push:
-    branches: [master]
-  workflow_dispatch: # Allows manual trigger
+    tags: ['v*']
+  workflow_dispatch:
 
 jobs:
-  'build-and-deploy':
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,209 +19,57 @@ jobs:
           node-version: '22'
           cache: 'yarn'
 
-      - name: Install Yarn
-        run: npm install -g yarn
-
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build project
+      - name: Build
         env:
           DOMAIN: ${{ secrets.DOMAIN }}
         run: yarn build:prod
 
-      - name: Setup SSH
+      - name: Package source
         run: |
-          # Create SSH directory
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
+          tar -czf deploy.tar.gz \
+            --exclude=build/uploads --exclude=.env \
+            build server config prisma src/shared package.json yarn.lock babel.config.json
 
-          # Add SSH key
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+      - name: Upload to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.VPS_HOST }}
+          username: ${{ vars.VPS_USER }}
+          port: ${{ vars.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: deploy.tar.gz
+          target: /tmp
 
-          # Add VPS to known hosts with retries
-          for i in {1..3}; do
-            if ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null; then
-              echo "Successfully added ${{ secrets.VPS_HOST }} to known_hosts"
-              break
-            else
-              echo "Attempt $i failed, retrying..."
-              sleep 2
-            fi
-          done
-
-          # Verify known_hosts was populated
-          if [ ! -s ~/.ssh/known_hosts ]; then
-            echo "Failed to add host keys, using StrictHostKeyChecking=no"
-            echo "Host ${{ secrets.VPS_HOST }}" >> ~/.ssh/config
-            echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-            echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
-          fi
-
-          chmod 644 ~/.ssh/known_hosts ~/.ssh/config 2>/dev/null || true
-
-      - name: Deploy to VPS
-        run: |
-          # Normalize deploy path (remove trailing slash) to avoid creating backups under "$DEPLOY_PATH/.backup.*"
-          DEPLOY_PATH="${{ vars.VPS_DEPLOY_PATH }}"
-          DEPLOY_PATH="${DEPLOY_PATH%/}"
-
-          # Create backup of current deployment
-          echo "Creating backup of current deployment..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            DEPLOY_PATH='${DEPLOY_PATH}'
-            if [ -d \"\$DEPLOY_PATH\" ] && [ \$(ls -A \"\$DEPLOY_PATH\" 2>/dev/null | wc -l) -gt 0 ]; then
-              BACKUP_DIR=\"\${DEPLOY_PATH}.backup.\$(date +%Y%m%d_%H%M%S)\"
-              sudo rsync -a --exclude='node_modules' \"\$DEPLOY_PATH\"/ \"\$BACKUP_DIR\"
-              sudo chown -R ${{ vars.VPS_USER }}:${{ vars.VPS_USER }} \"\$BACKUP_DIR\"
-              echo \"Created backup: \$BACKUP_DIR\"
-            fi
-          "
-
-          # Clear deployment directory
-          echo "Clearing deployment directory..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            DEPLOY_PATH='${DEPLOY_PATH}'
-            sudo rm -rf \"\$DEPLOY_PATH\"/*
-          "
-
-          # Upload new build and server files to temporary directory
-          echo "Uploading new build and server files to temporary directory..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p ~/temp_deploy/src/shared"
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" build/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/build/
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" server/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/server/
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" config/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/config/
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" prisma/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/prisma/
-          rsync -avz --no-links --exclude='node_modules' -e "ssh -i ~/.ssh/id_ed25519" src/shared/ ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/src/shared/
-          scp -i ~/.ssh/id_ed25519 package.json yarn.lock babel.config.json ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
-          scp -i ~/.ssh/id_ed25519 .github/systemd/stat-server.service ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }}:~/temp_deploy/
-
-          # Move files to deployment directory and set proper permissions
-          echo "Moving files to deployment directory and setting proper permissions..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            DEPLOY_PATH='${DEPLOY_PATH}'
-            sudo cp -r ~/temp_deploy/* \"\$DEPLOY_PATH\"/
-            sudo chown -R www-data:www-data \"\$DEPLOY_PATH\"
-            sudo chmod -R u=rwX,go=rX \"\$DEPLOY_PATH\"
-            rm -rf ~/temp_deploy
-          "
-
-
-          # Restart Node.js server
-          echo "Restarting Node.js server..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            DEPLOY_PATH='${DEPLOY_PATH}'
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
+        with:
+          host: ${{ vars.VPS_HOST }}
+          username: ${{ vars.VPS_USER }}
+          port: ${{ vars.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: DEPLOY_PATH
+          script: |
             set -e
-            # Stop existing server if running
-            sudo systemctl stop stat-server 2>/dev/null || true
+            mkdir -p "$DEPLOY_PATH"
+            TMP_DIR=$(mktemp -d)
+            tar -xzf /tmp/deploy.tar.gz -C "$TMP_DIR"
 
-            # Ensure Node.js is new enough for the actual runtime user (www-data).
-            # nvm can be available for the SSH user (e.g. ci) but NOT for www-data,
-            # and yarn install below runs as www-data.
-            echo 'Checking Node.js version for www-data on VPS...'
-            NODE_MAJOR=\$(sudo -u www-data -H bash -lc \"node -p 'process.versions.node.split(\\\".\\\")[0]' 2>/dev/null || echo 0\")
-            echo \"www-data node: \$(sudo -u www-data -H bash -lc 'node -v 2>/dev/null || echo missing')\"
-            if [ \"\$NODE_MAJOR\" -lt 18 ]; then
-              echo 'Upgrading Node.js to 18.x (LTS)...'
-              sudo apt-get update -y
-              sudo apt-get install -y curl ca-certificates
-              # Some Ubuntu images have distro Node 12 packages (notably libnode-dev) that conflict with NodeSource nodejs.
-              # Purge them first to avoid dpkg overwrite errors (e.g. /usr/include/node/common.gypi).
-              echo 'Removing conflicting distro node packages (if any)...'
-              sudo apt-get remove -y --purge nodejs npm libnode-dev nodejs-doc node-ws || true
-              sudo apt-get autoremove -y || true
-              sudo apt-get -f install -y || true
-              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-              sudo apt-get install -y nodejs
-              hash -r || true
-              echo \"Upgraded system node: \$(node -v)\"
-              echo \"www-data node after upgrade: \$(sudo -u www-data -H bash -lc 'node -v 2>/dev/null || echo missing')\"
-            fi
+            # Server runs via systemd as www-data (see .github/systemd/stat-server.service)
+            sudo rsync -a --exclude=uploads "$TMP_DIR"/ "$DEPLOY_PATH"/
+            sudo chown -R www-data:www-data "$DEPLOY_PATH"
+            rm -rf "$TMP_DIR" /tmp/deploy.tar.gz
 
-            # Install dependencies (deploy clears node_modules; service needs babel-node from node_modules/.bin)
-            echo 'Installing Node.js dependencies...'
-            if ! command -v yarn >/dev/null 2>&1; then
-              if command -v corepack >/dev/null 2>&1; then
-                sudo corepack enable || true
-              fi
-            fi
-            if ! command -v yarn >/dev/null 2>&1; then
-              echo 'yarn not found; installing globally via npm...'
-              sudo npm install -g yarn
-            fi
-            # Use per-deploy writable caches for yarn/npm. Some native deps (e.g. sharp) write to ~/.npm during install.
-            # Note: DEPLOY_PATH is a shell var in this SSH session; don't rely on it being exported into the sudo'ed shell.
-            sudo -u www-data -H bash -lc \"cd \\\"$DEPLOY_PATH\\\" && \
-              export HOME=\\\"$DEPLOY_PATH\\\" && \
-              export npm_config_cache=\\\"$DEPLOY_PATH/.npm-cache\\\" && \
-              export YARN_CACHE_FOLDER=\\\"$DEPLOY_PATH/.yarn-cache\\\" && \
-              mkdir -p \\\"$DEPLOY_PATH/.npm-cache\\\" \\\"$DEPLOY_PATH/.yarn-cache\\\" && \
-              # We run the server via babel-node (see systemd unit), so Babel presets/plugins from devDependencies
-              # are required at runtime. Force-install devDependencies on the VPS.
-              export YARN_PRODUCTION=false &&
-              yarn install --frozen-lockfile --non-interactive --no-progress --production=false\"
+            # babel-node runtime needs devDependencies -> full install
+            sudo -u www-data -H bash -lc "cd '$DEPLOY_PATH' && \
+              export HOME='$DEPLOY_PATH' && \
+              export npm_config_cache='$DEPLOY_PATH/.npm-cache' && \
+              export YARN_CACHE_FOLDER='$DEPLOY_PATH/.yarn-cache' && \
+              export YARN_PRODUCTION=false && \
+              yarn install --frozen-lockfile --non-interactive --no-progress --production=false"
 
-            # Install systemd service file (replace placeholder with actual path)
-            sed \"s|{{VPS_DEPLOY_PATH}}|\$DEPLOY_PATH|g\" \"\$DEPLOY_PATH\"/stat-server.service | sudo tee /etc/systemd/system/stat-server.service > /dev/null
-            sudo systemctl daemon-reload
-            sudo systemctl enable stat-server
-            echo 'Installed and enabled stat-server service'
-
-            # Start the service
-            if sudo systemctl start stat-server; then
-              echo 'Server restarted via systemd (stat-server.service)'
-            else
-              echo 'Failed to start stat-server.service'
-              exit 1
-            fi
-          "
-
-          # Cleanup old backups (keep only last 3)
-          echo "Cleaning up old backups (keeping only last 3)..."
-          ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            DEPLOY_PATH='${DEPLOY_PATH}'
-            ls -td \"\$DEPLOY_PATH\".backup.* 2>/dev/null | tail -n +4 | xargs -r sudo rm -rf
-            echo 'Cleaned up old backups'
-          "
-
-      - name: Health check
-        run: |
-          # Normalize deploy path (remove trailing slash) for rollback logic below
-          DEPLOY_PATH="${{ vars.VPS_DEPLOY_PATH }}"
-          DEPLOY_PATH="${DEPLOY_PATH%/}"
-
-          # Wait a moment for the deployment to settle
-          sleep 10
-
-          # Check if the site is responding.
-          # Do NOT follow redirects: many setups redirect http -> https, and following can fail with curl exit 60
-          # if TLS is misconfigured. We already accept 301/302 below.
-          CURL_URL="http://${{ secrets.VPS_HOST }}"
-          HTTP_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
-            --connect-timeout 5 --max-time 15 \
-            "$CURL_URL" || echo "000")
-
-          if [ $HTTP_STATUS -eq 200 ] || [ $HTTP_STATUS -eq 301 ] || [ $HTTP_STATUS -eq 302 ]; then
-            echo "✅ Health check passed! Site is responding with HTTP $HTTP_STATUS"
-          else
-            echo "❌ Health check failed! Site returned HTTP $HTTP_STATUS"
-            echo "Rolling back deployment..."
-
-            # Rollback logic
-            ssh -i ~/.ssh/id_ed25519 ${{ vars.VPS_USER }}@${{ secrets.VPS_HOST }} "
-              DEPLOY_PATH='${DEPLOY_PATH}'
-              BACKUP_DIR=\$(ls -td \"\$DEPLOY_PATH\".backup.* 2>/dev/null | head -n1)
-              if [ ! -z \"\$BACKUP_DIR\" ] && [ -d \"\$BACKUP_DIR\" ]; then
-                echo \"Found backup directory: \$BACKUP_DIR\"
-                sudo rm -rf \"\$DEPLOY_PATH\"/*
-                sudo cp -r \"\$BACKUP_DIR\"/* \"\$DEPLOY_PATH\"/
-                sudo chown -R www-data:www-data \"\$DEPLOY_PATH\"
-                sudo systemctl reload nginx
-                echo 'Rollback completed successfully'
-              else
-                echo 'No backup directory found, cannot rollback'
-              fi
-            "
-            exit 1
-          fi
+            sudo systemctl restart stat-server
