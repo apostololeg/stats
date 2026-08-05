@@ -31,7 +31,8 @@ jobs:
         run: |
           tar -czf deploy.tar.gz \
             --exclude=build/uploads --exclude=.env \
-            build server config prisma src/shared package.json yarn.lock babel.config.json
+            build server config prisma src/shared package.json yarn.lock babel.config.json \
+            .github/systemd/stat-server.service
 
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -72,4 +73,8 @@ jobs:
               export YARN_PRODUCTION=false && \
               yarn install --frozen-lockfile --non-interactive --no-progress --production=false"
 
+            # Install/update systemd unit and restart
+            sed "s|{{VPS_DEPLOY_PATH}}|$DEPLOY_PATH|g" "$DEPLOY_PATH/.github/systemd/stat-server.service" | sudo tee /etc/systemd/system/stat-server.service > /dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl enable stat-server
             sudo systemctl restart stat-server
