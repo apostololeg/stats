@@ -61,6 +61,12 @@ jobs:
             sudo mkdir -p "$DEPLOY_PATH"
             sudo chown "$USER:$USER" "$DEPLOY_PATH"
 
+            # .env is not in the tarball and CI cannot invent secrets
+            if ! sudo test -f "$DEPLOY_PATH/.env"; then
+              echo "ERROR: $DEPLOY_PATH/.env missing - create it from .env.sample first (DATABASE_URL, JWT_SECRET, ...)"
+              exit 1
+            fi
+
             TMP_DIR=$(mktemp -d)
             tar -xzf /tmp/deploy.tar.gz -C "$TMP_DIR"
 
@@ -94,6 +100,38 @@ jobs:
               sudo npm install -g yarn
             fi
 
+            # Fresh VPS bootstrap: PostgreSQL + app role/database from DATABASE_URL
+            if ! command -v psql >/dev/null 2>&1; then
+              sudo apt-get update -y
+              sudo apt-get install -y postgresql
+            fi
+            sudo systemctl enable --now postgresql
+
+            DB_ENV=$(sudo cat "$DEPLOY_PATH/.env" | node -e '
+              const s = require("fs").readFileSync(0, "utf8");
+              const m = s.match(/^\s*DATABASE_URL\s*=\s*(.+?)\s*$/m);
+              if (!m) { console.error("DATABASE_URL not found in .env"); process.exit(1); }
+              const u = new URL(m[1].replace(/^["'"'"']|["'"'"']$/g, ""));
+              const db = u.pathname.replace(/^\//, "").split("?")[0];
+              [u.username, u.password, u.hostname, u.port || "5432", db]
+                .forEach(v => console.log(decodeURIComponent(v)));
+            ')
+            mapfile -t DB <<< "$DB_ENV"
+            DB_USER=${DB[0]}; DB_PASS=${DB[1]}; DB_HOST=${DB[2]}; DB_NAME=${DB[4]}
+
+            if [ "$DB_HOST" = "localhost" ] || [ "$DB_HOST" = "127.0.0.1" ]; then
+              # Escape single quotes for the SQL string literal
+              DB_PASS_SQL=$(printf '%s' "$DB_PASS" | sed "s/'/''/g")
+              if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" | grep -q 1; then
+                sudo -u postgres psql -c "CREATE ROLE \"$DB_USER\" LOGIN PASSWORD '$DB_PASS_SQL'"
+              fi
+              if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1; then
+                sudo -u postgres psql -c "CREATE DATABASE \"$DB_NAME\" OWNER \"$DB_USER\""
+              fi
+            else
+              echo "DATABASE_URL host '$DB_HOST' is not local - skipping postgres role/db provisioning"
+            fi
+
             # babel-node runtime needs devDependencies -> full install
             sudo -u www-data -H bash -lc "cd '$DEPLOY_PATH' && \
               export HOME='$DEPLOY_PATH' && \
@@ -101,6 +139,13 @@ jobs:
               export YARN_CACHE_FOLDER='$DEPLOY_PATH/.yarn-cache' && \
               export YARN_PRODUCTION=false && \
               yarn install --frozen-lockfile --non-interactive --no-progress --production=false"
+
+            # Apply DB migrations (prisma CLI auto-loads .env from cwd; needs node_modules from install)
+            sudo -u www-data -H bash -lc "cd '$DEPLOY_PATH' && \
+              export HOME='$DEPLOY_PATH' && \
+              export npm_config_cache='$DEPLOY_PATH/.npm-cache' && \
+              export YARN_CACHE_FOLDER='$DEPLOY_PATH/.yarn-cache' && \
+              yarn prisma migrate deploy"
 
             # Install/update systemd unit and restart (creates the unit on a fresh VPS)
             # Unmask first: a masked unit is a /dev/null symlink, so tee would silently discard the unit
