@@ -31,7 +31,9 @@ body
   overflow hidden
 
 .listItem
-  width 100%
+  width calc(100% - 4px)
+  flex-grow 1
+  margin 2px
 
   & + &
     margin-top var(--indent-s)

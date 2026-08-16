@@ -46,7 +46,7 @@
     "@babel/node": "7.8.7",
     "@babel/plugin-transform-modules-commonjs": "^7.9.0",
     "@babel/runtime-corejs3": "^7.9.2",
-    "@homecode/ui": "^4.29.1",
+    "@homecode/ui": "^5.7.6",
     "@lcdp/offline-plugin": "^5.1.1",
     "@prisma/client": "^4.14.0-dev.81",
     "@sentry/react": "^6.19.2",

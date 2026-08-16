@@ -1,18 +1,18 @@
 import { Button, Icon } from '@homecode/ui';
-import cn from 'classnames';
 import { useCallback, useEffect, useState } from 'react';
 
-import EditProject from 'components/EditProject/EditProject';
 import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
-import { useStore } from 'justorm/react';
-import { useProjects } from 'store/projects';
-import { reportEvent } from 'tools/analytics';
-
+import EditProject from 'components/EditProject/EditProject';
 import S from './ProjectsList.styl';
+import cn from 'classnames';
+import { reportEvent } from 'tools/analytics';
+import { useProjects } from 'store/projects';
+import { useStore } from 'justorm/react';
 
 type Props = {
   itemProps?: any;
   renderItem?: (item: any) => React.ReactNode;
+  inline?: boolean;
 };
 
 function ProjectItem({
@@ -79,7 +79,7 @@ function ProjectItem({
   );
 }
 
-export default function ProjectsList({ itemProps, renderItem }: Props) {
+export default function ProjectsList({ itemProps, renderItem, inline }: Props) {
   const projects = useProjects(['items']);
   const [isShowAddForm, setIsShowAddForm] = useState(false);
 
@@ -88,7 +88,7 @@ export default function ProjectsList({ itemProps, renderItem }: Props) {
   }, []);
 
   return (
-    <>
+    <div className={cn(S.root, inline && S.inline)}>
       {projects.items.map(({ id, name }) => (
         <ProjectItem
           {...itemProps}
@@ -105,13 +105,13 @@ export default function ProjectsList({ itemProps, renderItem }: Props) {
         <div className={S.footer}>
           <Button
             variant="primary"
-            className={S.addButton}
             onClick={() => setIsShowAddForm(true)}
+            prefixElem={<Icon type="plus" size="s" />}
           >
             Add Project
           </Button>
         </div>
       )}
-    </>
+    </div>
   );
 }
