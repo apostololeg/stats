@@ -20,10 +20,12 @@ dom.watchControllerFlag();
 
 export default function App() {
   const user = useUser(['isLogged']);
-  const { app } = useStore({
+  const { app, router } = useStore({
     app: ['theme', 'isSidebarOpen'],
     projects: [],
+    router: ['path'],
   });
+  const isLiveActive = router.path === '/live';
 
   useEffect(() => {
     user.init();
@@ -56,9 +58,14 @@ export default function App() {
             {user.isLogged && (
               <ButtonLink
                 href="/live"
-                className={cn(S.listItem, S.sidebarLiveLink)}
+                className={cn(
+                  S.listItem,
+                  S.sidebarLiveLink,
+                  isLiveActive && S.isActive,
+                )}
                 size="l"
                 onClick={app.toggleSidebar}
+                {...(isLiveActive && { 'aria-current': 'page' as const })}
               >
                 Live
               </ButtonLink>
@@ -66,6 +73,7 @@ export default function App() {
             <ProjectsList
               itemProps={{
                 className: S.listItem,
+                activeClassName: S.isActive,
                 size: 'l',
                 onClick: app.toggleSidebar,
               }}

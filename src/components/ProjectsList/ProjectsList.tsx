@@ -1,8 +1,10 @@
 import { Button, Icon } from '@homecode/ui';
+import cn from 'classnames';
 import { useCallback, useState } from 'react';
 
 import EditProject from 'components/EditProject/EditProject';
 import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
+import { useStore } from 'justorm/react';
 import { useProjects } from 'store/projects';
 import { reportEvent } from 'tools/analytics';
 
@@ -17,15 +19,20 @@ function ProjectItem({
   id,
   name,
   renderItem,
+  activeClassName,
   ...props
 }: {
   id: string;
   name: string;
   renderItem: (item: any) => React.ReactNode;
+  activeClassName?: string;
+  className?: string;
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const projects = useProjects();
+  const { router } = useStore({ router: ['path'] });
   const [isEditing, setIsEditing] = useState(false);
+  const isActive = router.path === `/project/${id}`;
 
   const onEditClick = useCallback(
     e => {
@@ -49,11 +56,13 @@ function ProjectItem({
     <div className={S.item}>
       <ButtonLink
         {...props}
+        className={cn(props.className, isActive && activeClassName)}
         onClick={e => {
           props?.onClick?.(e);
           reportEvent('project_click');
         }}
         href={`/project/${id}`}
+        {...(isActive && { 'aria-current': 'page' as const })}
       >
         {renderItem?.({ id, name }) || name}
       </ButtonLink>
