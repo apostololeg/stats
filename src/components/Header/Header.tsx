@@ -1,4 +1,4 @@
-import { Button, Input, debounce } from '@homecode/ui';
+import { Button, Input, RouterStore, debounce } from '@homecode/ui';
 import cn from 'classnames';
 import { useCallback, useState } from 'react';
 
@@ -15,9 +15,8 @@ type Props = {
 let acc = 0;
 
 export default function Header() {
-  const { user, router, app } = useStore({
+  const { user, app } = useStore({
     user: ['isLogged'],
-    router: [],
     app: ['isSidebarOpen'],
   });
 
@@ -36,7 +35,7 @@ export default function Header() {
     if (window.innerWidth < BREAKPOINTS.MOBILE) {
       app.toggleSidebar();
     } else {
-      router.go('/');
+      RouterStore.go('/');
     }
   }, [user.isLogged]);
 

@@ -8,6 +8,7 @@ import Routes from 'components/Routes/Routes';
 import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
 import { useStore } from 'justorm/react';
 import live from 'store/live';
+import { useRouterPath } from 'store/router';
 import user, { useUser } from 'store/user';
 
 import S from './App.styl';
@@ -20,12 +21,12 @@ dom.watchControllerFlag();
 
 export default function App() {
   const user = useUser(['isLogged']);
-  const { app, router } = useStore({
+  const { app } = useStore({
     app: ['theme', 'isSidebarOpen'],
     projects: [],
-    router: ['path'],
   });
-  const isLiveActive = router.path === '/live';
+  const path = useRouterPath();
+  const isLiveActive = path === '/live';
 
   useEffect(() => {
     user.init();

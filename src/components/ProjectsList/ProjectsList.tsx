@@ -1,13 +1,14 @@
 import { Button, Icon } from '@homecode/ui';
+import cn from 'classnames';
 import { useCallback, useEffect, useState } from 'react';
 
-import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
 import EditProject from 'components/EditProject/EditProject';
-import S from './ProjectsList.styl';
-import cn from 'classnames';
-import { reportEvent } from 'tools/analytics';
+import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
 import { useProjects } from 'store/projects';
-import { useStore } from 'justorm/react';
+import { useRouterPath } from 'store/router';
+import { reportEvent } from 'tools/analytics';
+
+import S from './ProjectsList.styl';
 
 type Props = {
   itemProps?: any;
@@ -30,9 +31,9 @@ function ProjectItem({
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const projects = useProjects();
-  const { router } = useStore({ router: ['path'] });
+  const path = useRouterPath();
   const [isEditing, setIsEditing] = useState(false);
-  const isActive = router.path === `/project/${id}`;
+  const isActive = path === `/project/${id}`;
 
   const onEditClick = useCallback(
     e => {
