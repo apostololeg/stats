@@ -10,20 +10,24 @@ export type Project = {
 const STORE = createStore('projects', {
   items: [] as Project[],
 
+  isLoading: false,
   loadingByPid: {},
 
-  async load(pid: string) {
-    if (this.loadingByPid[pid]) {
+  async load(pid?: string) {
+    if (this.isLoading || this.items.length > 0) {
       return;
     }
 
-    this.loadingByPid[pid] = true;
+    this.isLoading = true;
+    if (pid) this.loadingByPid[pid] = true;
 
-    const res = await api.get('/project');
-
-    this.items.push(...res.projects);
-
-    this.loadingByPid[pid] = false;
+    try {
+      const res = await api.get('/project');
+      this.items.push(...res.projects);
+    } finally {
+      this.isLoading = false;
+      if (pid) this.loadingByPid[pid] = false;
+    }
   },
 
   async upsert(data) {

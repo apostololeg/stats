@@ -1,6 +1,6 @@
 import { Button, Icon } from '@homecode/ui';
 import cn from 'classnames';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import EditProject from 'components/EditProject/EditProject';
 import ButtonLink from 'components/UI/ButtonLink/ButtonLink';
@@ -82,6 +82,10 @@ function ProjectItem({
 export default function ProjectsList({ itemProps, renderItem }: Props) {
   const projects = useProjects(['items']);
   const [isShowAddForm, setIsShowAddForm] = useState(false);
+
+  useEffect(() => {
+    projects.load();
+  }, []);
 
   return (
     <>
