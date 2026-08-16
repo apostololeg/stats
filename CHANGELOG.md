@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.3](https://github.com/apostololeg/stat/compare/v2.1.2...v2.1.3) (2026-08-16)
+
+
+### Features
+
+* ProjectsList - Highlight selected project ([b6f7665](https://github.com/apostololeg/stat/commit/b6f76655a4924739d88c8aa996fab5c21ef0b2e3))
+
+
+### Bug Fixes
+
+* ProejctList - inline mode and UI lib update ([d0b43cf](https://github.com/apostololeg/stat/commit/d0b43cfeafcae0f4928cd97ff0049997dee5950d))
+* ProjectsList - Load projects on / and /live ([410a586](https://github.com/apostololeg/stat/commit/410a5866a2434a43c26e265928263bf67ff79762))
+
 ### [2.1.2](https://github.com/apostololeg/stat/compare/v2.1.1...v2.1.2) (2026-08-05)
 
 
