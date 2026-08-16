@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.4](https://github.com/apostololeg/stat/compare/v2.1.3...v2.1.4) (2026-08-16)
+
+
+### Bug Fixes
+
+* App - Read path from RouterStore ([56a9094](https://github.com/apostololeg/stat/commit/56a909447335407fd32eff9979b6159c549641b8))
+
 ### [2.1.3](https://github.com/apostololeg/stat/compare/v2.1.2...v2.1.3) (2026-08-16)
 
 
