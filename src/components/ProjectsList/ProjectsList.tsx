@@ -1,4 +1,4 @@
-import { Button, Icon } from '@homecode/ui';
+import { Button, Gap, Icon } from '@homecode/ui';
 import cn from 'classnames';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -35,15 +35,14 @@ function ProjectItem({
   const [isEditing, setIsEditing] = useState(false);
   const isActive = path === `/project/${id}`;
 
-  const onEditClick = useCallback(
-    e => {
-      setIsEditing(true);
-    },
-    [id],
-  );
+  const onEditClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+  }, []);
 
   const onDeleteClick = useCallback(
-    e => {
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
       projects.delete(id);
     },
     [id],
@@ -66,16 +65,16 @@ function ProjectItem({
         {...(isActive && { 'aria-current': 'page' as const })}
       >
         {renderItem?.({ id, name }) || name}
+        <Gap />
+        <div className={S.actions} onClick={e => e.stopPropagation()}>
+          <Button variant="clear" size="s" square round onClick={onEditClick}>
+            <Icon type="edit" size="s" />
+          </Button>
+          <Button variant="clear" size="s" square round onClick={onDeleteClick}>
+            <Icon type="delete" size="s" />
+          </Button>
+        </div>
       </ButtonLink>
-
-      <div className={S.actions}>
-        <Button variant="clear" size="s" square round onClick={onEditClick}>
-          <Icon type="edit" size="s" />
-        </Button>
-        <Button variant="clear" size="s" square round onClick={onDeleteClick}>
-          <Icon type="delete" size="s" />
-        </Button>
-      </div>
     </div>
   );
 }

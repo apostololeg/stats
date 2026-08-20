@@ -1,4 +1,5 @@
 import { createStore, useStore } from 'justorm/react';
+import { api } from 'tools/request';
 
 const MAX_EVENTS = 500;
 const RECONNECT_BASE_MS = 1000;
@@ -20,6 +21,24 @@ export type LiveEvent = {
 
 export type LiveStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
 
+export type LiveFilterOptions = {
+  time: string[];
+  country: string[];
+  project: { id: string; name: string }[];
+  type: string[];
+  name: string[];
+  client: string[];
+};
+
+const EMPTY_FILTER_OPTIONS: LiveFilterOptions = {
+  time: [],
+  country: [],
+  project: [],
+  type: ['page', 'event'],
+  name: [],
+  client: [],
+};
+
 type LiveMessage =
   | { type: 'history'; events: LiveEvent[] }
   | { type: 'event'; event: LiveEvent };
@@ -27,8 +46,10 @@ type LiveMessage =
 const STORE = createStore('live', {
   events: [] as LiveEvent[],
   status: 'idle' as LiveStatus,
+  filterOptions: null as LiveFilterOptions | null,
 
   _ws: null as WebSocket | null,
+  _loadingFilterOptions: false,
   _reconnectTimer: null as ReturnType<typeof setTimeout> | null,
   _reconnectDelay: RECONNECT_BASE_MS,
   _shouldReconnect: false,
@@ -105,6 +126,20 @@ const STORE = createStore('live', {
     if (this._reconnectTimer) {
       clearTimeout(this._reconnectTimer);
       this._reconnectTimer = null;
+    }
+  },
+
+  async loadFilterOptions() {
+    if (this.filterOptions || this._loadingFilterOptions) return;
+
+    this._loadingFilterOptions = true;
+
+    try {
+      this.filterOptions = await api.get('/live/filters');
+    } catch {
+      this.filterOptions = EMPTY_FILTER_OPTIONS;
+    } finally {
+      this._loadingFilterOptions = false;
     }
   },
 });

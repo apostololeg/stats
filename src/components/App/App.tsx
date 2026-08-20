@@ -1,4 +1,12 @@
-import { Checkbox, Notifications, Scroll, Theme, VH, dom } from '@homecode/ui';
+import {
+  Checkbox,
+  Gap,
+  Notifications,
+  Scroll,
+  Theme,
+  VH,
+  dom,
+} from '@homecode/ui';
 import cn from 'classnames';
 import { useEffect } from 'react';
 
@@ -69,6 +77,8 @@ export default function App() {
                 {...(isLiveActive && { 'aria-current': 'page' as const })}
               >
                 Live
+                <Gap />
+                {isLiveActive && <span className={S.liveDot} aria-hidden />}
               </ButtonLink>
             )}
             <ProjectsList

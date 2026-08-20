@@ -23,6 +23,7 @@ body
   flex-shrink 0
   width 300px
   max-width 300px
+  padding var(--p-1)
   background-color var(--accent-color-alpha-50)
 
 .list
@@ -34,6 +35,8 @@ body
   width calc(100% - 4px)
   flex-grow 1
   margin 2px
+  justify-content flex-start
+  text-align left
 
   & + &
     margin-top var(--indent-s)
@@ -43,11 +46,42 @@ body
     box-shadow 0 0 0 2px var(--active-color-alpha-500)
 
 .sidebarLiveLink
-  margin-bottom var(--indent-s)
+  margin-bottom var(--p-2)
+  align-items center
+  gap 6px
+  overflow visible
 
   &.isLive
     background-color var(--success-color-alpha-100)
     box-shadow 0 0 0 2px var(--success-color-alpha-500)
+
+.liveDot
+  position relative
+  flex-shrink 0
+  width 8px
+  height 8px
+  border-radius 50%
+  background-color var(--success-color-alpha-500)
+
+  &::after
+    content ''
+    position absolute
+    inset 0
+    border-radius inherit
+    background-color inherit
+    pointer-events none
+    animation liveDotPulse 3s ease-out infinite
+
+@keyframes liveDotPulse
+  0%
+    transform scale(1)
+    opacity .7
+  25%
+    transform scale(4)
+    opacity 0
+  100%
+    transform scale(4)
+    opacity 0
 
 .darkThemeCheckbox
   position relative

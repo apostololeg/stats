@@ -1,13 +1,25 @@
 import { DateTime, Link, Table } from '@homecode/ui';
 import cn from 'classnames';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useStore } from 'justorm/react';
-import { LiveEvent, useLive } from 'store/live';
+import liveStore, { useLive } from 'store/live';
 import { countryNameToFlagEmoji } from 'tools/countryFlag';
 
+import { ColumnFilter } from './ColumnFilter';
 import S from './LiveEvents.styl';
 import { LivePlot } from './LivePlot';
+import {
+  ColumnFilters,
+  FilterColumn,
+  FilterOption,
+  LiveEventRow,
+  applyColumnFilters,
+  mergeFilterOptions,
+  optionsFromApi,
+  optionsFromRows,
+  truncateId,
+} from './liveFilters';
 
 const STATUS_LABEL = {
   idle: 'Idle',
@@ -16,85 +28,36 @@ const STATUS_LABEL = {
   disconnected: 'Reconnecting…',
 };
 
-const ID_PREVIEW_LENGTH = 6;
-
-function truncateId(id: string): string {
-  return id.length > ID_PREVIEW_LENGTH
-    ? `${id.slice(0, ID_PREVIEW_LENGTH)}...`
-    : id;
+function HeaderCell({
+  label,
+  column,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  column: FilterColumn;
+  options: FilterOption[];
+  value?: string;
+  onChange: (column: FilterColumn, value?: string) => void;
+}) {
+  return (
+    <div className={S.headerCell}>
+      <span>{label}</span>
+      <ColumnFilter
+        label={label}
+        options={options}
+        value={value}
+        onChange={next => onChange(column, next)}
+      />
+    </div>
+  );
 }
 
-type LiveEventRow = LiveEvent & {
-  projectName: string;
-  type: string;
-  name: string;
-  country: string;
-  countryFlag: string;
-};
-
-const COLUMNS = [
-  {
-    id: 'time',
-    label: 'Time',
-    render: ({ time }: LiveEventRow) => (
-      <span title={time}>
-        <DateTime value={time} format="fromNow" />
-      </span>
-    ),
-  },
-  {
-    id: 'country',
-    label: 'Country',
-    render: ({ country, countryFlag }: LiveEventRow) => (
-      <span title={country !== '—' ? country : undefined}>{countryFlag}</span>
-    ),
-  },
-  {
-    id: 'project',
-    label: 'Project',
-    render: ({ projectName, pid }: LiveEventRow) => {
-      const isRawPid = projectName === pid;
-      const label = isRawPid ? truncateId(projectName) : projectName;
-
-      return (
-        <Link
-          href={`//project/${pid}`}
-          className={S.projectLink}
-          title={projectName}
-          isClear
-          inline
-        >
-          {label}
-        </Link>
-      );
-    },
-  },
-  {
-    id: 'type',
-    label: 'Type',
-    dataField: 'type',
-  },
-  {
-    id: 'name',
-    label: 'Name',
-    render: ({ name }: LiveEventRow) => (
-      <span className={S.cellEllipsis} title={name}>
-        {name}
-      </span>
-    ),
-  },
-  {
-    id: 'client',
-    label: 'Client',
-    render: ({ cid }: LiveEventRow) => (
-      <span title={cid}>{truncateId(cid)}</span>
-    ),
-  },
-];
-
 export default function LiveEvents() {
-  const live = useLive(['events', 'status']);
+  const live = useLive(['events', 'status', 'filterOptions']);
   const { projects } = useStore({ projects: ['items'] });
+  const [filters, setFilters] = useState<ColumnFilters>({});
 
   const projectNames = useMemo(
     () =>
@@ -122,6 +85,147 @@ export default function LiveEvents() {
     [live.events, projectNames],
   );
 
+  const columnOptions = useMemo(
+    () =>
+      mergeFilterOptions(
+        optionsFromRows(tableData),
+        optionsFromApi(live.filterOptions),
+      ),
+    [tableData, live.filterOptions],
+  );
+
+  const filteredData = useMemo(
+    () => applyColumnFilters(tableData, filters),
+    [tableData, filters],
+  );
+
+  const onFilterChange = useCallback((column: FilterColumn, value?: string) => {
+    setFilters(prev => {
+      if (!value) {
+        const next = { ...prev };
+        delete next[column];
+        return next;
+      }
+
+      return { ...prev, [column]: value };
+    });
+  }, []);
+
+  const columns = useMemo(
+    () => [
+      {
+        id: 'time',
+        label: (
+          <HeaderCell
+            label="Time"
+            column="time"
+            options={columnOptions.time}
+            value={filters.time}
+            onChange={onFilterChange}
+          />
+        ),
+        render: ({ time }: LiveEventRow) => (
+          <span title={time}>
+            <DateTime value={time} format="fromNow" />
+          </span>
+        ),
+      },
+      {
+        id: 'country',
+        label: (
+          <HeaderCell
+            label="Country"
+            column="country"
+            options={columnOptions.country}
+            value={filters.country}
+            onChange={onFilterChange}
+          />
+        ),
+        render: ({ country, countryFlag }: LiveEventRow) => (
+          <span title={country}>{countryFlag}</span>
+        ),
+      },
+      {
+        id: 'project',
+        label: (
+          <HeaderCell
+            label="Project"
+            column="project"
+            options={columnOptions.project}
+            value={filters.project}
+            onChange={onFilterChange}
+          />
+        ),
+        render: ({ projectName, pid }: LiveEventRow) => {
+          const isRawPid = projectName === pid;
+          const label = isRawPid ? truncateId(projectName) : projectName;
+
+          return (
+            <Link
+              href={`//project/${pid}`}
+              className={S.projectLink}
+              title={projectName}
+              isClear
+              inline
+            >
+              {label}
+            </Link>
+          );
+        },
+      },
+      {
+        id: 'type',
+        label: (
+          <HeaderCell
+            label="Type"
+            column="type"
+            options={columnOptions.type}
+            value={filters.type}
+            onChange={onFilterChange}
+          />
+        ),
+        dataField: 'type',
+      },
+      {
+        id: 'name',
+        label: (
+          <HeaderCell
+            label="Name"
+            column="name"
+            options={columnOptions.name}
+            value={filters.name}
+            onChange={onFilterChange}
+          />
+        ),
+        render: ({ name }: LiveEventRow) => (
+          <span className={S.cellEllipsis} title={name}>
+            {name}
+          </span>
+        ),
+      },
+      {
+        id: 'client',
+        label: (
+          <HeaderCell
+            label="Client"
+            column="client"
+            options={columnOptions.client}
+            value={filters.client}
+            onChange={onFilterChange}
+          />
+        ),
+        render: ({ cid }: LiveEventRow) => (
+          <span title={cid}>{truncateId(cid)}</span>
+        ),
+      },
+    ],
+    [columnOptions, filters, onFilterChange],
+  );
+
+  useEffect(() => {
+    liveStore.loadFilterOptions();
+  }, []);
+
   return (
     <div className={S.root}>
       <div className={S.header}>
@@ -132,12 +236,13 @@ export default function LiveEvents() {
 
       <LivePlot events={live.events} />
 
-      {tableData.length > 0 ? (
-        <div className={S.tableWrap}>
-          <Table className={S.table} columns={COLUMNS} data={tableData} />
-        </div>
-      ) : (
-        <p className={S.empty}>No live events yet</p>
+      <div className={S.tableWrap}>
+        <Table className={S.table} columns={columns} data={filteredData} />
+      </div>
+      {filteredData.length === 0 && (
+        <p className={S.empty}>
+          {tableData.length === 0 ? 'No live events yet' : 'No matching events'}
+        </p>
       )}
     </div>
   );

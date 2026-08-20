@@ -11,6 +11,9 @@ json('../../constants/layoutBreakpoints.json')
   margin-bottom var(--indent-s)
 
 .status
+  position absolute
+  right var(--p-4)
+  top var(--p-4)
   font-size 80%
   padding 2px 8px
   border-radius 999px
@@ -78,6 +81,43 @@ json('../../constants/layoutBreakpoints.json')
   th:nth-child(6),
   td:nth-child(6)
     min-width 4.5em
+    white-space nowrap
+
+.headerCell
+  display grid
+  grid-template-columns max-content minmax(0, 1fr)
+  align-items center
+  column-gap 4px
+  row-gap 4px
+  min-width 0
+
+  > span
+    grid-column 1
+    grid-row 1
+    white-space nowrap
+
+.filterButton
+  grid-column 2
+  grid-row 1
+  justify-self start
+  flex-shrink 0
+
+.filterSelect
+  min-width 8em
+  max-width 12em
+
+.filterChip
+  grid-column 1 / -1
+  grid-row 2
+  justify-self start
+  max-width 9em
+  min-width 0
+
+  span
+    display block
+    min-width 0
+    overflow hidden
+    text-overflow ellipsis
     white-space nowrap
 
 .cellEllipsis

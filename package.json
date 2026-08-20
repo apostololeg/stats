@@ -13,6 +13,7 @@
     "url": "git+https://github.com/apostololeg/stat.git"
   },
   "scripts": {
+    "dev": "concurrently -k \"yarn server:dev\" \"yarn client:dev\"",
     "build:dev": "NODE_ENV=development webpack --mode=development --config ./config/webpack/dev.js --progress",
     "build:prod": "NODE_ENV=production webpack --mode=production --config ./config/webpack/prod.js --progress && yarn build:sdk && ln -sf uploads build/uploads",
     "build:sdk": "NODE_ENV=production webpack --config ./config/webpack/sdk.js",
@@ -25,6 +26,7 @@
     "db:reset": "prisma migrate reset --skip-seed",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate",
+    "db:seed": "prisma db seed",
     "client:dev": "DEV_ENV=client webpack-dev-server --config ./config/webpack/dev.js --progress",
     "prod": "yarn build:prod && yarn server:prod",
     "ts": "tsc --noUnusedLocals",
@@ -143,6 +145,7 @@
     "clean-webpack-plugin": "^4.0.0",
     "component-directory-webpack-plugin": "^1.0.5",
     "compression-webpack-plugin": "^11.1.0",
+    "concurrently": "^9.1.2",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "eslint": "6.4.0",
@@ -175,5 +178,8 @@
   "resolutions": {
     "justorm": "3.0.0-beta-25"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
 }

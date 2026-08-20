@@ -1,7 +1,7 @@
 .root
   display flex
   flex-direction column
-  gap var(--indent-s)
+  gap var(--p-1)
 
   &.inline
     flex-direction row
@@ -10,25 +10,24 @@
 
 .item
   display flex
-  justify-content space-between
   align-items center
   margin-left 2px
   margin-right 2px
-  // margin-top var(--indent-s)
 
-  // & + &
-  //   margin-top var(--indent-s)
+  & > button
+    padding-right var(--p-2)
 
 .actions
-  position absolute
-  right var(--indent-m)
   display flex
   align-items center
+  flex-shrink 0
   gap 2px
   opacity 0
+  pointer-events none
 
   .item:hover &
     opacity 1
+    pointer-events auto
 
 
 .footer
