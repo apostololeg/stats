@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/apostololeg/stat/compare/v2.1.4...v2.2.0) (2026-08-20)
+
+
+### Features
+
+* LiveEvents - Column filters and sidebar polish ([e24a90a](https://github.com/apostololeg/stat/commit/e24a90ab3a0ce98d35b03d14497617c6c890c951))
+
 ### [2.1.4](https://github.com/apostololeg/stat/compare/v2.1.3...v2.1.4) (2026-08-16)
 
 
