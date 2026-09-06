@@ -3,7 +3,7 @@ export function timezoneCity2Country(timeZone) {
 
   const city = timeZone.split('/').slice(-1)[0];
   const country = Object.entries(MAP).find(([country, cities]) =>
-    cities.includes(city)
+    cities.includes(city),
   )?.[0];
 
   return country;
@@ -300,7 +300,7 @@ const MAP = {
   Turkey: ['Istanbul'],
   Tuvalu: ['Funafuti'],
   Taiwan: ['Taipei'],
-  Ukraine: ['Kiev', 'Uzhgorod', 'Zaporozhye'],
+  Ukraine: ['Kiev', 'Kyiv', 'Uzhgorod', 'Zaporozhye'],
   'US minor outlying islands': ['Wake', 'Midway'],
   'United States': [
     'New_York',

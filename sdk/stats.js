@@ -78,7 +78,7 @@
       send(pid, { page: p || location.pathname, timeZone: getTimeZone() });
     },
     reportEvent(event) {
-      send(pid, { event });
+      send(pid, { event, timeZone: getTimeZone() });
     },
   };
   watchHistory(reportPageCb);
