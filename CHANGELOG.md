@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/apostololeg/stat/compare/v2.2.0...v2.3.0) (2026-09-06)
+
+
+### Features
+
+* LiveEvents - Country filter exclusions and multiselect ([d2e1a49](https://github.com/apostololeg/stat/commit/d2e1a49d26050f9c3446f39f90fd965f1979542f))
+
+
+### Bug Fixes
+
+* App version position ([0555f40](https://github.com/apostololeg/stat/commit/0555f40b1ff46a5ddf0c17ea9c340dfb447dee01))
+* LiveEvents - Connect live stream after auth is ready ([c830a97](https://github.com/apostololeg/stat/commit/c830a977d77afac18b8c0c707ef46fab9a138c97))
+* LivePlot - Align minute buckets so the activity chart isn't empty ([4e63b50](https://github.com/apostololeg/stat/commit/4e63b50f44f92f425b8673c75ce9812afa32b133))
+* StatsSdk - Send timeZone on events ([25d8cec](https://github.com/apostololeg/stat/commit/25d8cec50e43002bd4186ed08ac452e4f9032cda))
+
 ## [2.2.0](https://github.com/apostololeg/stat/compare/v2.1.4...v2.2.0) (2026-08-20)
 
 
