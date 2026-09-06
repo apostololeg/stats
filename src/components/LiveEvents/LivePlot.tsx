@@ -14,7 +14,7 @@ import { LiveEvent } from 'store/live';
 
 import S from './LivePlot.styl';
 
-const WINDOW_MS = 60 * 60 * 1000;
+const WINDOW_MS = 2 * 60 * 60 * 1000;
 const BUCKET_MS = 60 * 1000;
 
 const LINE_CHART_MARGIN = {
@@ -26,18 +26,20 @@ const LINE_CHART_MARGIN = {
 
 function bucketEvents(events: LiveEvent[]) {
   const now = Date.now();
-  const start = now - WINDOW_MS;
+  const startBucket = Math.floor((now - WINDOW_MS) / BUCKET_MS) * BUCKET_MS;
+  const endBucket = Math.floor(now / BUCKET_MS) * BUCKET_MS;
   const buckets: Record<number, number> = {};
 
-  for (let t = start; t <= now; t += BUCKET_MS) {
+  for (let t = startBucket; t <= endBucket; t += BUCKET_MS) {
     buckets[t] = 0;
   }
 
   events.forEach(({ time }) => {
     const ts = new Date(time).getTime();
-    if (ts < start) return;
+    if (Number.isNaN(ts)) return;
     const bucket = Math.floor(ts / BUCKET_MS) * BUCKET_MS;
-    if (buckets[bucket] !== undefined) buckets[bucket]++;
+    if (buckets[bucket] === undefined) return;
+    buckets[bucket]++;
   });
 
   return Object.entries(buckets).map(([ts, count]) => ({
