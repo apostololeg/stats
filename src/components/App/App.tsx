@@ -28,7 +28,7 @@ require('./store');
 dom.watchControllerFlag();
 
 export default function App() {
-  const user = useUser(['isLogged']);
+  const user = useUser(['isLogged', 'isInited']);
   const { app } = useStore({
     app: ['theme', 'isSidebarOpen'],
     projects: [],

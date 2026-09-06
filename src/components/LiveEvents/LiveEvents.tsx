@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useStore } from 'justorm/react';
 import liveStore, { useLive } from 'store/live';
+import { useUser } from 'store/user';
 import { countryNameToFlagEmoji } from 'tools/countryFlag';
 
 import { ColumnFilter } from './ColumnFilter';
@@ -58,6 +59,7 @@ function HeaderCell({
 
 export default function LiveEvents() {
   const live = useLive(['events', 'status', 'filterOptions']);
+  const user = useUser(['isLogged', 'isInited']);
   const { projects } = useStore({ projects: ['items'] });
   const [filters, setFilters] = useState<ColumnFilters>({});
 
@@ -230,6 +232,11 @@ export default function LiveEvents() {
   useEffect(() => {
     liveStore.loadFilterOptions();
   }, []);
+
+  useEffect(() => {
+    if (!user.isInited || !user.isLogged) return;
+    liveStore.connect();
+  }, [user.isInited, user.isLogged]);
 
   return (
     <div className={S.root}>
