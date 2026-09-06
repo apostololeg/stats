@@ -23,7 +23,46 @@ export type FilterOption = { id: string; label: string };
 
 export type FilterOptionsByColumn = Record<FilterColumn, FilterOption[]>;
 
-export type ColumnFilters = Partial<Record<FilterColumn, string>>;
+export type ColumnFilterValue = string | string[];
+
+export type ColumnFilters = Partial<Record<FilterColumn, ColumnFilterValue>>;
+
+export const EXCLUDE_PREFIX = '-';
+
+export function isExcludeFilter(value?: string): boolean {
+  return Boolean(value?.startsWith(EXCLUDE_PREFIX));
+}
+
+export function getFilterId(value?: string): string | undefined {
+  if (!value) return undefined;
+  return isExcludeFilter(value) ? value.slice(EXCLUDE_PREFIX.length) : value;
+}
+
+export function toExcludeFilter(id: string): string {
+  return `${EXCLUDE_PREFIX}${id}`;
+}
+
+export function toFilterTokens(value?: ColumnFilterValue): string[] {
+  if (!value) return [];
+  return (Array.isArray(value) ? value : [value]).filter(Boolean);
+}
+
+export function addFilterToken(
+  current: ColumnFilterValue | undefined,
+  token: string,
+): string[] {
+  const id = getFilterId(token);
+  const next = toFilterTokens(current).filter(item => getFilterId(item) !== id);
+  next.push(token);
+  return next;
+}
+
+export function removeFilterToken(
+  current: ColumnFilterValue | undefined,
+  token: string,
+): string[] {
+  return toFilterTokens(current).filter(item => item !== token);
+}
 
 export const FILTER_COLUMNS: FilterColumn[] = [
   'time',
@@ -86,13 +125,41 @@ export function applyColumnFilters(
   rows: LiveEventRow[],
   filters: ColumnFilters,
 ): LiveEventRow[] {
-  const active = FILTER_COLUMNS.filter(column => filters[column]);
+  const active = FILTER_COLUMNS.filter(
+    column => toFilterTokens(filters[column]).length > 0,
+  );
 
   if (active.length === 0) return rows;
 
   return rows.filter(row =>
-    active.every(column => getColumnValue(row, column) === filters[column]),
+    active.every(column =>
+      matchesColumnFilter(getColumnValue(row, column), filters[column]!),
+    ),
   );
+}
+
+function matchesColumnFilter(
+  rowValue: string,
+  filter: ColumnFilterValue,
+): boolean {
+  const tokens = toFilterTokens(filter);
+  if (tokens.length === 0) return true;
+
+  const includes: string[] = [];
+  const excludes: string[] = [];
+
+  for (const token of tokens) {
+    if (isExcludeFilter(token)) {
+      const id = getFilterId(token);
+      if (id) excludes.push(id);
+    } else {
+      includes.push(token);
+    }
+  }
+
+  if (excludes.includes(rowValue)) return false;
+  if (includes.length > 0) return includes.includes(rowValue);
+  return true;
 }
 
 export function optionsFromRows(rows: LiveEventRow[]): FilterOptionsByColumn {

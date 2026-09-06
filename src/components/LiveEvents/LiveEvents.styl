@@ -50,6 +50,9 @@ json('../../constants/layoutBreakpoints.json')
     background-color var(--decent-color-alpha-900)
     backdrop-filter blur(10px)
 
+    th
+      vertical-align top
+
   th,
   td
     border none
@@ -106,9 +109,15 @@ json('../../constants/layoutBreakpoints.json')
   min-width 8em
   max-width 12em
 
-.filterChip
+.filterChips
   grid-column 1 / -1
   grid-row 2
+  display flex
+  flex-wrap wrap
+  gap 4px
+  min-width 0
+
+.filterChip
   justify-self start
   max-width 9em
   min-width 0

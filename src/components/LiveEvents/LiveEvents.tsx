@@ -10,6 +10,7 @@ import { ColumnFilter } from './ColumnFilter';
 import S from './LiveEvents.styl';
 import { LivePlot } from './LivePlot';
 import {
+  ColumnFilterValue,
   ColumnFilters,
   FilterColumn,
   FilterOption,
@@ -38,8 +39,8 @@ function HeaderCell({
   label: string;
   column: FilterColumn;
   options: FilterOption[];
-  value?: string;
-  onChange: (column: FilterColumn, value?: string) => void;
+  value?: ColumnFilterValue;
+  onChange: (column: FilterColumn, value?: ColumnFilterValue) => void;
 }) {
   return (
     <div className={S.headerCell}>
@@ -48,6 +49,7 @@ function HeaderCell({
         label={label}
         options={options}
         value={value}
+        multiple={column === 'country'}
         onChange={next => onChange(column, next)}
       />
     </div>
@@ -99,17 +101,20 @@ export default function LiveEvents() {
     [tableData, filters],
   );
 
-  const onFilterChange = useCallback((column: FilterColumn, value?: string) => {
-    setFilters(prev => {
-      if (!value) {
-        const next = { ...prev };
-        delete next[column];
-        return next;
-      }
+  const onFilterChange = useCallback(
+    (column: FilterColumn, value?: ColumnFilterValue) => {
+      setFilters(prev => {
+        if (!value || (Array.isArray(value) && value.length === 0)) {
+          const next = { ...prev };
+          delete next[column];
+          return next;
+        }
 
-      return { ...prev, [column]: value };
-    });
-  }, []);
+        return { ...prev, [column]: value };
+      });
+    },
+    [],
+  );
 
   const columns = useMemo(
     () => [
