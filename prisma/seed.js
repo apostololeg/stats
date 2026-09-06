@@ -5,7 +5,10 @@ const prisma = new PrismaClient();
 
 const FALLBACK_PROJECTS = [
   { name: 'GLASS', domain: 'glass.cat/' },
+  { name: 'BestHumans', domain: 'besthumans.app/' },
+  { name: 'sandbox', domain: 'sandbox.local/' },
   { name: 'scores.cat', domain: 'scores.cat/' },
+  { name: 'Shaping', domain: 'shaping.app/' },
 ];
 
 const PROJECT_TRAFFIC = {
@@ -13,9 +16,21 @@ const PROJECT_TRAFFIC = {
     pages: ['/', '/calls', '/chats', '/settings', '/dashboard', '/contacts'],
     events: ['call_started', 'call_ended', 'message_sent', 'signup', 'login'],
   },
+  BestHumans: {
+    pages: ['/', '/jobs', '/candidates', '/pipeline', '/settings'],
+    events: ['apply', 'interview_booked', 'hire', 'signup', 'login'],
+  },
+  sandbox: {
+    pages: ['/', '/demo', '/playground', '/docs'],
+    events: ['click_cta', 'signup', 'feature_flag', 'error'],
+  },
   'scores.cat': {
     pages: ['/', '/scores', '/live', '/about', '/leaderboard'],
     events: ['score_submit', 'share', 'signup', 'click_cta', 'download'],
+  },
+  Shaping: {
+    pages: ['/', '/board', '/projects', '/settings'],
+    events: ['task_created', 'comment', 'signup', 'login'],
   },
 };
 
@@ -119,14 +134,16 @@ async function ensureProjects() {
   const existing = await prisma.project.findMany({
     select: { id: true, name: true, domain: true },
   });
+  const byName = new Map(existing.map(p => [p.name.trim(), p]));
 
-  if (existing.length > 0) return existing;
-
-  const created = [];
   for (const data of FALLBACK_PROJECTS) {
-    created.push(await prisma.project.create({ data }));
+    if (!byName.has(data.name)) {
+      const created = await prisma.project.create({ data });
+      byName.set(data.name, created);
+    }
   }
-  return created;
+
+  return [...byName.values()];
 }
 
 async function main() {
