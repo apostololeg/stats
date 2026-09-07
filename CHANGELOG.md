@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.1](https://github.com/apostololeg/stat/compare/v2.3.0...v2.3.1) (2026-09-07)
+
+
+### Bug Fixes
+
+* CountryFlag - Show "ru" instead of Russian flag ([a2fd47d](https://github.com/apostololeg/stat/commit/a2fd47db8d28c3398c9f865b486018b725f15fc9))
+
 ## [2.3.0](https://github.com/apostololeg/stat/compare/v2.2.0...v2.3.0) (2026-09-06)
 
 
