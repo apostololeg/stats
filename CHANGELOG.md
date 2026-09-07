@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.3](https://github.com/apostololeg/stat/compare/v2.3.2...v2.3.3) (2026-09-07)
+
+
+### Features
+
+* LiveEvents - Highlight rows arrived while tab hidden ([dd200c6](https://github.com/apostololeg/stat/commit/dd200c6132b8b1212153371500f76dbe6f971cd7))
+
 ### [2.3.2](https://github.com/apostololeg/stat/compare/v2.3.1...v2.3.2) (2026-09-07)
 
 
