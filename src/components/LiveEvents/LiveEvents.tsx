@@ -1,5 +1,4 @@
-import { DateTime, LS, Link, Table } from '@homecode/ui';
-import useEvent from '@homecode/ui/dist/esm/src/hooks/useEvent';
+import { DateTime, LS, Link, Table, useEvent } from '@homecode/ui';
 import cn from 'classnames';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
