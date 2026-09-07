@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.4](https://github.com/apostololeg/stat/compare/v2.3.3...v2.3.4) (2026-09-07)
+
+
+### Bug Fixes
+
+* LiveEvents - Import useEvent default export ([9b73999](https://github.com/apostololeg/stat/commit/9b73999811148e5006bc83b3a7d0cb26b17abe76))
+
 ### [2.3.3](https://github.com/apostololeg/stat/compare/v2.3.2...v2.3.3) (2026-09-07)
 
 
