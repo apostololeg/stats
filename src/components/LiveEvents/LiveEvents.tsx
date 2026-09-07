@@ -1,4 +1,4 @@
-import { DateTime, Link, Table } from '@homecode/ui';
+import { DateTime, LS, Link, Table } from '@homecode/ui';
 import cn from 'classnames';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -15,11 +15,13 @@ import {
   ColumnFilters,
   FilterColumn,
   FilterOption,
+  LIVE_EVENTS_FILTERS_LS_KEY,
   LiveEventRow,
   applyColumnFilters,
   mergeFilterOptions,
   optionsFromApi,
   optionsFromRows,
+  parseStoredFilters,
   truncateId,
 } from './liveFilters';
 
@@ -61,7 +63,9 @@ export default function LiveEvents() {
   const live = useLive(['events', 'status', 'filterOptions']);
   const user = useUser(['isLogged', 'isInited']);
   const { projects } = useStore({ projects: ['items'] });
-  const [filters, setFilters] = useState<ColumnFilters>({});
+  const [filters, setFilters] = useState<ColumnFilters>(() =>
+    parseStoredFilters(LS.get(LIVE_EVENTS_FILTERS_LS_KEY)),
+  );
 
   const projectNames = useMemo(
     () =>
@@ -106,13 +110,16 @@ export default function LiveEvents() {
   const onFilterChange = useCallback(
     (column: FilterColumn, value?: ColumnFilterValue) => {
       setFilters(prev => {
+        const next = { ...prev };
+
         if (!value || (Array.isArray(value) && value.length === 0)) {
-          const next = { ...prev };
           delete next[column];
-          return next;
+        } else {
+          next[column] = value;
         }
 
-        return { ...prev, [column]: value };
+        LS.set(LIVE_EVENTS_FILTERS_LS_KEY, next);
+        return next;
       });
     },
     [],

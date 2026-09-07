@@ -27,6 +27,8 @@ export type ColumnFilterValue = string | string[];
 
 export type ColumnFilters = Partial<Record<FilterColumn, ColumnFilterValue>>;
 
+export const LIVE_EVENTS_FILTERS_LS_KEY = 'liveEvents.filters';
+
 export const EXCLUDE_PREFIX = '-';
 
 export function isExcludeFilter(value?: string): boolean {
@@ -72,6 +74,26 @@ export const FILTER_COLUMNS: FilterColumn[] = [
   'name',
   'client',
 ];
+
+export function parseStoredFilters(stored: unknown): ColumnFilters {
+  if (!stored || typeof stored !== 'object' || Array.isArray(stored)) return {};
+
+  const next: ColumnFilters = {};
+
+  for (const column of FILTER_COLUMNS) {
+    const value = (stored as Record<string, unknown>)[column];
+    if (typeof value === 'string' && value) {
+      next[column] = value;
+    } else if (Array.isArray(value)) {
+      const tokens = value.filter(
+        (item): item is string => typeof item === 'string' && Boolean(item),
+      );
+      if (tokens.length) next[column] = tokens;
+    }
+  }
+
+  return next;
+}
 
 export function truncateId(id: string): string {
   return id.length > ID_PREVIEW_LENGTH
