@@ -9,6 +9,7 @@ export type LiveEventRow = LiveEvent & {
   name: string;
   country: string;
   countryFlag: string;
+  className?: string;
 };
 
 export type FilterColumn =

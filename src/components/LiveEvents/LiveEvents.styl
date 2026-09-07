@@ -46,6 +46,12 @@ json('../../constants/layoutBreakpoints.json')
     border-collapse collapse
     border-spacing 0
 
+    tbody tr
+      transition 5s background-color
+
+      &.arrivedWhileHidden
+        background-color var(--warning-color-alpha-100)
+
   thead
     background-color var(--decent-color-alpha-900)
     backdrop-filter blur(10px)

@@ -1,9 +1,9 @@
-import { DateTime, LS, Link, Table } from '@homecode/ui';
+import { DateTime, LS, Link, Table, useEvent } from '@homecode/ui';
 import cn from 'classnames';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useStore } from 'justorm/react';
-import liveStore, { useLive } from 'store/live';
+import liveStore, { LiveEvent, useLive } from 'store/live';
 import { useUser } from 'store/user';
 import { countryNameToFlagEmoji } from 'tools/countryFlag';
 
@@ -66,6 +66,43 @@ export default function LiveEvents() {
   const [filters, setFilters] = useState<ColumnFilters>(() =>
     parseStoredFilters(LS.get(LIVE_EVENTS_FILTERS_LS_KEY)),
   );
+  const [pageHidden, setPageHidden] = useState(
+    () => document.visibilityState === 'hidden',
+  );
+  const [arrivedWhileHiddenIds, setArrivedWhileHiddenIds] = useState<
+    Set<string>
+  >(() => new Set());
+  const seenEventIdsRef = useRef(new Set<string>());
+
+  const onVisibilityChange = useCallback(() => {
+    const hidden = document.visibilityState === 'hidden';
+    setPageHidden(hidden);
+    if (!hidden) setArrivedWhileHiddenIds(new Set());
+  }, []);
+
+  useEvent({ event: 'visibilitychange', callback: onVisibilityChange });
+
+  useEffect(() => {
+    const nextIds = new Set<string>(
+      live.events.map((event: LiveEvent) => event.id),
+    );
+
+    if (pageHidden) {
+      const added: string[] = [];
+      for (const id of nextIds) {
+        if (!seenEventIdsRef.current.has(id)) added.push(id);
+      }
+      if (added.length > 0) {
+        setArrivedWhileHiddenIds(prev => {
+          const next = new Set(prev);
+          added.forEach(id => next.add(id));
+          return next;
+        });
+      }
+    }
+
+    seenEventIdsRef.current = nextIds;
+  }, [live.events, pageHidden]);
 
   const projectNames = useMemo(
     () =>
@@ -88,9 +125,12 @@ export default function LiveEvents() {
           name: page ?? eventName ?? '—',
           country,
           countryFlag: countryNameToFlagEmoji(countryName),
+          className: arrivedWhileHiddenIds.has(event.id)
+            ? S.arrivedWhileHidden
+            : undefined,
         };
       }),
-    [live.events, projectNames],
+    [live.events, projectNames, arrivedWhileHiddenIds],
   );
 
   const columnOptions = useMemo(
