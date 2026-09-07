@@ -7,6 +7,8 @@ export function iso2ToFlagEmoji(iso2: string): string {
 
   if (!/^[A-Z]{2}$/.test(code)) return '';
 
+  if (code === 'RU') return 'ru';
+
   return String.fromCodePoint(
     ...[...code].map(char => REGIONAL_INDICATOR_A + char.charCodeAt(0) - 65),
   );
