@@ -13,41 +13,58 @@ const router = express.Router();
 
 let total = 0;
 
-db.project.count().then(n => (total = n));
+db.project
+  .count()
+  .then(n => (total = n))
+  .catch(() => {});
 
 export default router
   .get('/', async (req, res) => {
-    const params = parseIds(req.query, ['skip', 'take']);
+    try {
+      const params = parseIds(req.query, ['skip', 'take']);
 
-    if (!params.take || params.take > PAGE_SIZE) params.take = PAGE_SIZE;
+      if (!params.take || params.take > PAGE_SIZE) params.take = PAGE_SIZE;
 
-    params.select = { id: true, name: true, domain: true };
-    params.orderBy = {
-      updatedAt: 'desc',
-      ...params?.orderBy,
-    };
+      params.select = { id: true, name: true, domain: true };
+      params.orderBy = {
+        updatedAt: 'desc',
+        ...params?.orderBy,
+      };
 
-    const projects = await db.project.findMany(params);
+      const [projects, count] = await Promise.all([
+        db.project.findMany(params),
+        db.project.count(),
+      ]);
+      total = count;
 
-    res.json({ projects, total });
+      res.json({ projects, total });
+    } catch (err) {
+      console.error('GET /api/project failed:', err.message);
+      res.status(503).json({ error: 'Database unavailable' });
+    }
   })
 
   .post('/', adminMiddleware, async (req, res) => {
-    let { id, name, domain } = req.body;
+    try {
+      let { id, name, domain } = req.body;
 
-    if (!/\/$/.test(domain)) domain += '/';
+      if (!/\/$/.test(domain)) domain += '/';
 
-    const data = { name, domain };
-    const project = await db.project.upsert({
-      where: { id },
-      create: data,
-      update: data,
-    });
+      const data = { name, domain };
+      const project = await db.project.upsert({
+        where: { id },
+        create: data,
+        update: data,
+      });
 
-    addAllowedOrigin(domain);
+      addAllowedOrigin(domain);
 
-    total++;
-    res.json({ project, total });
+      total++;
+      res.json({ project, total });
+    } catch (err) {
+      console.error('POST /api/project failed:', err.message);
+      res.status(503).json({ error: 'Database unavailable' });
+    }
   })
 
   .delete('/:id', adminMiddleware, async (req, res) => {

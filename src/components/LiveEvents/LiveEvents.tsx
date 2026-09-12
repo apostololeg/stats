@@ -52,7 +52,7 @@ function HeaderCell({
         label={label}
         options={options}
         value={value}
-        multiple={column === 'country'}
+        multiple
         onChange={next => onChange(column, next)}
       />
     </div>
