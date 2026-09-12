@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.7](https://github.com/apostololeg/stat/compare/v2.3.6...v2.3.7) (2026-09-12)
+
+
+### Features
+
+* LiveEvents - Multi-select filters and DB resilience ([e0adea2](https://github.com/apostololeg/stat/commit/e0adea28edbec4ed0ba69551c602c465cd4c234e))
+
 ### [2.3.6](https://github.com/apostololeg/stat/compare/v2.3.5...v2.3.6) (2026-09-07)
 
 
