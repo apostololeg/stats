@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.8](https://github.com/apostololeg/stat/compare/v2.3.7...v2.3.8) (2026-10-11)
+
+
+### Features
+
+* LiveEvents - Date range, bars, and plot ([636a181](https://github.com/apostololeg/stat/commit/636a181e44f0ea602bb6126e17339ab11e24a570))
+
 ### [2.3.7](https://github.com/apostololeg/stat/compare/v2.3.6...v2.3.7) (2026-09-12)
 
 
