@@ -1,13 +1,33 @@
-import { DateTime, LS, Link, Table, useEvent } from '@homecode/ui';
+import {
+  Button,
+  DatePickerInput,
+  DateTime,
+  GridLayout,
+  LS,
+  Link,
+  Table,
+  useDebounceCallback,
+  useEvent,
+} from '@homecode/ui';
 import cn from 'classnames';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useStore } from 'justorm/react';
 import liveStore, { LiveEvent, useLive } from 'store/live';
+import { rangeBoundsMs } from 'store/reports';
 import { useUser } from 'store/user';
+import { reportEvent } from 'tools/analytics';
 import { countryNameToFlagEmoji } from 'tools/countryFlag';
 
 import { ColumnFilter } from './ColumnFilter';
+import { LiveBars } from './LiveBars';
 import S from './LiveEvents.styl';
 import { LivePlot } from './LivePlot';
 import {
@@ -24,6 +44,45 @@ import {
   parseStoredFilters,
   truncateId,
 } from './liveFilters';
+import {
+  LIVE_DATE_INTERVAL_LS_KEY,
+  eventsInRange,
+  lastWeekInterval,
+  readLiveDateInterval,
+} from './liveRange';
+
+const SAME_ROW_TOLERANCE_PX = 8;
+
+function useSideBySideChartHeight() {
+  const barsRef = useRef<HTMLDivElement>(null);
+  const plotRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const bars = barsRef.current;
+    const plot = plotRef.current;
+    if (!bars || !plot) return;
+
+    const sync = () => {
+      const sameRow =
+        Math.abs(
+          bars.getBoundingClientRect().top - plot.getBoundingClientRect().top,
+        ) < SAME_ROW_TOLERANCE_PX;
+      const next = sameRow && bars.offsetHeight > 0 ? bars.offsetHeight : null;
+
+      setHeight(prev => (prev === next ? prev : next));
+    };
+
+    const observer = new ResizeObserver(sync);
+    observer.observe(bars);
+    if (bars.parentElement) observer.observe(bars.parentElement);
+    sync();
+
+    return () => observer.disconnect();
+  }, []);
+
+  return { barsRef, plotRef, height };
+}
 
 const STATUS_LABEL = {
   idle: 'Idle',
@@ -60,9 +119,18 @@ function HeaderCell({
 }
 
 export default function LiveEvents() {
-  const live = useLive(['events', 'status', 'filterOptions']);
+  const live = useLive([
+    'events',
+    'rangeEvents',
+    'isLoadingRange',
+    'status',
+    'filterOptions',
+  ]);
   const user = useUser(['isLogged', 'isInited']);
   const { projects } = useStore({ projects: ['items'] });
+  const [dateInterval, setDateIntervalState] = useState(() =>
+    readLiveDateInterval(LS.get(LIVE_DATE_INTERVAL_LS_KEY)),
+  );
   const [filters, setFilters] = useState<ColumnFilters>(() =>
     parseStoredFilters(LS.get(LIVE_EVENTS_FILTERS_LS_KEY)),
   );
@@ -73,6 +141,7 @@ export default function LiveEvents() {
     Set<string>
   >(() => new Set());
   const seenEventIdsRef = useRef(new Set<string>());
+  const { barsRef, plotRef, height: plotHeight } = useSideBySideChartHeight();
 
   const onVisibilityChange = useCallback(() => {
     const hidden = document.visibilityState === 'hidden';
@@ -104,6 +173,50 @@ export default function LiveEvents() {
     seenEventIdsRef.current = nextIds;
   }, [live.events, pageHidden]);
 
+  const setDateInterval = (next: string[]) => {
+    const ordered = readLiveDateInterval(next);
+    setDateIntervalState(ordered);
+    LS.set(LIVE_DATE_INTERVAL_LS_KEY, ordered);
+  };
+
+  const isLastWeek =
+    dateInterval[0] === lastWeekInterval[0] &&
+    dateInterval[1] === lastWeekInterval[1];
+
+  const loadRange = useDebounceCallback(
+    (startDate: string, endDate: string) => {
+      liveStore.loadRange(startDate, endDate);
+    },
+    500,
+    [],
+  );
+
+  const onDateIntervalChange = (next: string[]) => {
+    setDateInterval(next);
+    reportEvent('date_interval_change');
+  };
+
+  const onLastWeekClick = () => {
+    setDateInterval(lastWeekInterval);
+    reportEvent('last_week_click');
+  };
+
+  const bounds = useMemo(
+    () => rangeBoundsMs(dateInterval[0], dateInterval[1]),
+    [dateInterval],
+  );
+
+  const rangedEvents = useMemo(
+    () =>
+      eventsInRange(
+        live.rangeEvents,
+        live.events,
+        dateInterval[0],
+        dateInterval[1],
+      ),
+    [live.rangeEvents, live.events, dateInterval],
+  );
+
   const projectNames = useMemo(
     () =>
       Object.fromEntries(
@@ -114,7 +227,7 @@ export default function LiveEvents() {
 
   const tableData = useMemo<LiveEventRow[]>(
     () =>
-      live.events.map(event => {
+      rangedEvents.map(event => {
         const { page, event: eventName, country: countryName } = event.data;
         const country = countryName ?? '—';
 
@@ -130,7 +243,7 @@ export default function LiveEvents() {
             : undefined,
         };
       }),
-    [live.events, projectNames, arrivedWhileHiddenIds],
+    [rangedEvents, projectNames, arrivedWhileHiddenIds],
   );
 
   const columnOptions = useMemo(
@@ -281,28 +394,65 @@ export default function LiveEvents() {
   }, []);
 
   useEffect(() => {
+    loadRange(dateInterval[0], dateInterval[1]);
+  }, [dateInterval, loadRange]);
+
+  useEffect(() => {
     if (!user.isInited || !user.isLogged) return;
     liveStore.connect();
   }, [user.isInited, user.isLogged]);
 
+  let emptyLabel = 'No matching events';
+  if (tableData.length === 0) {
+    emptyLabel = live.isLoadingRange
+      ? 'Loading events…'
+      : 'No events in this range';
+  }
+
   return (
     <div className={S.root}>
-      <div className={S.header}>
+      <div className={S.toolbar}>
+        <div className={S.controls}>
+          {!isLastWeek && (
+            <Button variant="clear" size="s" round onClick={onLastWeekClick}>
+              Last week
+            </Button>
+          )}
+          <DatePickerInput
+            size="s"
+            value={dateInterval}
+            onChange={onDateIntervalChange}
+            buttonProps={{ round: true }}
+            popupProps={{
+              blur: true,
+              animation: false,
+              elevation: 1,
+              contentProps: { className: S.datePicker },
+            }}
+          />
+        </div>
         <span className={cn(S.status, S[live.status])}>
           {STATUS_LABEL[live.status]}
         </span>
       </div>
 
-      <LivePlot events={live.events} />
+      <div className={cn(live.isLoadingRange && S.isLoading)}>
+        <GridLayout colWidth={400} className={S.charts}>
+          <LiveBars rootRef={barsRef} rows={tableData} />
+          <LivePlot
+            rootRef={plotRef}
+            height={plotHeight}
+            events={rangedEvents}
+            from={bounds.start}
+            to={bounds.end}
+          />
+        </GridLayout>
 
-      <div className={S.tableWrap}>
-        <Table className={S.table} columns={columns} data={filteredData} />
+        <div className={S.tableWrap}>
+          <Table className={S.table} columns={columns} data={filteredData} />
+        </div>
+        {filteredData.length === 0 && <p className={S.empty}>{emptyLabel}</p>}
       </div>
-      {filteredData.length === 0 && (
-        <p className={S.empty}>
-          {tableData.length === 0 ? 'No live events yet' : 'No matching events'}
-        </p>
-      )}
     </div>
   );
 }

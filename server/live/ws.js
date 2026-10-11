@@ -22,7 +22,7 @@ function isAdminRequest(req) {
   return decodeToken(token)?.key === ADMIN_KEY;
 }
 
-function serializeEvent({ id, cid, pid, time, data }) {
+export function serializeEvent({ id, cid, pid, time, data }) {
   return {
     id,
     cid,

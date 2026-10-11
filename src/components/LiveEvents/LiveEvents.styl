@@ -5,15 +5,37 @@ json('../../constants/layoutBreakpoints.json')
   min-width 0
   max-width 100%
 
-.header
+.toolbar
   display flex
   align-items center
+  justify-content space-between
+  gap 10px
   margin-bottom var(--indent-s)
+  min-width 0
+
+.controls
+  display flex
+  align-items center
+  gap 10px
+  min-width 0
+  font-size 0
+
+.datePicker
+  max-width 300px
+  min-width 300px
+
+.isLoading
+  opacity 0.45
+
+.charts
+  // `> div` beats the chart roots' equal-specificity width/margin rules.
+  > div
+    width 100%
+    margin-left 0
+    min-width 400px
 
 .status
-  position absolute
-  right var(--p-4)
-  top var(--p-4)
+  flex-shrink 0
   font-size 80%
   padding 2px 8px
   border-radius 999px
@@ -28,8 +50,8 @@ json('../../constants/layoutBreakpoints.json')
     background-color var(--warning-color-alpha-100, var(--accent-color-alpha-100))
 
 .tableWrap
-  height calc(100 * var(--vh) - 280px)
-  min-height 320px
+  height calc(100 * var(--vh) - 540px)
+  min-height 220px
   margin-top var(--indent-s)
   width 100%
   overflow hidden
@@ -156,6 +178,13 @@ json('../../constants/layoutBreakpoints.json')
   overflow hidden
 
 @media screen and (max-width: unit(MOBILE, 'px'))
+  .toolbar
+    flex-wrap wrap
+
+  .datePicker
+    min-width 0
+    max-width 100%
+
   .tableWrap
     width 100%
     max-width 100%

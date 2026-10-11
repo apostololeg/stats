@@ -1,9 +1,46 @@
 import express from 'express';
 
 import db from '../api/db';
+import { serializeEvent } from '../live/ws';
 import { adminMiddleware } from './auth';
 
 const router = express.Router();
+
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function normalizeRangeDate(value, isEnd) {
+  const str = Array.isArray(value) ? value[0] : value;
+  if (!str || typeof str !== 'string') return null;
+
+  const iso = DATE_ONLY_RE.test(str)
+    ? `${str}T${isEnd ? '23:59:59.999' : '00:00:00.000'}Z`
+    : str;
+  const date = new Date(iso);
+
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+}
+
+router.get('/events', adminMiddleware, async (req, res) => {
+  try {
+    const start = normalizeRangeDate(req.query.startDate, false);
+    const end = normalizeRangeDate(req.query.endDate, true);
+
+    if (!start || !end || start > end)
+      return res.status(400).send({ ok: false });
+
+    const events = await db.event.findMany({
+      where: { time: { gte: start, lte: end } },
+      orderBy: { time: 'desc' },
+      select: { id: true, cid: true, pid: true, time: true, data: true },
+    });
+
+    res.json({ events: events.map(serializeEvent) });
+  } catch (err) {
+    console.error('Live events error:', err);
+    res.status(500).send({ ok: false });
+  }
+});
 
 function threeMonthsAgo() {
   const date = new Date();
@@ -15,7 +52,7 @@ function sortValues(set) {
   return [...set].sort();
 }
 
-export default router.get('/filters', adminMiddleware, async (req, res) => {
+router.get('/filters', adminMiddleware, async (req, res) => {
   try {
     const events = await db.event.findMany({
       where: { time: { gte: threeMonthsAgo() } },
@@ -63,3 +100,5 @@ export default router.get('/filters', adminMiddleware, async (req, res) => {
     res.status(500).send({ ok: false });
   }
 });
+
+export default router;

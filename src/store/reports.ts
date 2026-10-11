@@ -8,9 +8,16 @@ export const buildInterval = (startDate: string, endDate: string) =>
 
 const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function toRangeDateString(date: string, isEnd: boolean) {
+export function toRangeDateString(date: string, isEnd: boolean) {
   if (!DATE_ONLY_RE.test(date)) return date;
   return `${date}T${isEnd ? '23:59:59.999' : '00:00:00.000'}Z`;
+}
+
+export function rangeBoundsMs(startDate: string, endDate: string) {
+  return {
+    start: new Date(toRangeDateString(startDate, false)).getTime(),
+    end: new Date(toRangeDateString(endDate, true)).getTime(),
+  };
 }
 
 export type RequestParams = {

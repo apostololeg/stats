@@ -45,11 +45,14 @@ type LiveMessage =
 
 const STORE = createStore('live', {
   events: [] as LiveEvent[],
+  rangeEvents: [] as LiveEvent[],
+  isLoadingRange: false,
   status: 'idle' as LiveStatus,
   filterOptions: null as LiveFilterOptions | null,
 
   _ws: null as WebSocket | null,
   _loadingFilterOptions: false,
+  _rangeRequestId: 0,
   _reconnectTimer: null as ReturnType<typeof setTimeout> | null,
   _reconnectDelay: RECONNECT_BASE_MS,
   _shouldReconnect: false,
@@ -126,6 +129,26 @@ const STORE = createStore('live', {
     if (this._reconnectTimer) {
       clearTimeout(this._reconnectTimer);
       this._reconnectTimer = null;
+    }
+  },
+
+  async loadRange(startDate: string, endDate: string) {
+    if (!startDate || !endDate) return;
+
+    const requestId = ++this._rangeRequestId;
+    this.isLoadingRange = true;
+
+    try {
+      const res = await api.get('/live/events', {
+        data: { startDate, endDate },
+      });
+
+      if (requestId !== this._rangeRequestId) return;
+      this.rangeEvents = Array.isArray(res?.events) ? res.events : [];
+    } catch {
+      if (requestId !== this._rangeRequestId) return;
+    } finally {
+      if (requestId === this._rangeRequestId) this.isLoadingRange = false;
     }
   },
 

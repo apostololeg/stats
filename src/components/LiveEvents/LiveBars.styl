@@ -1,0 +1,26 @@
+.root
+  position relative
+  width calc(100% + 40px)
+  height 220px
+  margin-left -40px
+  margin-bottom 8px
+
+.tooltip
+  // Same wash as the plot tooltip, laid over the page color so bars cannot show through.
+  background-color var(--decent-color)
+  background-image linear-gradient(var(--accent-color-alpha-50), var(--accent-color-alpha-50))
+  box-shadow inset 0 1px 1px 0 var(--accent-color-alpha-100)
+  padding 3px 8px
+  border-radius 8px
+  border none
+  font-size 80%
+
+  b
+    font-size 120%
+
+.tooltipLabel
+  opacity 0.5
+
+.xAxis,
+.yAxis
+  opacity 0.5
