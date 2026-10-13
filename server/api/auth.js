@@ -21,7 +21,7 @@ const COOKIE_OPTS = {
 
 // Without maxAge the browser stores a session cookie. Desktop browsers keep
 // that for the browser session; a mobile standalone app drops it on kill.
-function sessionCookieMaxAge() {
+export function sessionCookieMaxAge() {
   const raw =
     typeof SESSION_EXPIRED_AFTER === 'string' && SESSION_EXPIRED_AFTER
       ? SESSION_EXPIRED_AFTER
