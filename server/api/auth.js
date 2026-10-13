@@ -10,7 +10,7 @@ import {
 } from '../../config/const';
 import { getAuthToken } from '../tools/tokens';
 
-const DEFAULT_SESSION = '30d';
+const DEFAULT_SESSION = '365d';
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -33,6 +33,12 @@ export function sessionCookieMaxAge() {
 
 export const encodeToken = (data, params = {}) =>
   jwt.sign(data, JWT_SECRET, params);
+
+export function createAdminToken(key, secret = JWT_SECRET) {
+  return jwt.sign({ key }, secret, {
+    expiresIn: SESSION_EXPIRED_AFTER || DEFAULT_SESSION,
+  });
+}
 
 export const decodeToken = token => {
   if (!token) return null;

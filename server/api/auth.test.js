@@ -2,8 +2,16 @@ import assert from 'assert';
 import http from 'http';
 
 import express from 'express';
+import jwt from 'jsonwebtoken';
 
-import { clearCookie, sessionCookieMaxAge, setCookie } from './auth';
+import {
+  clearCookie,
+  createAdminToken,
+  sessionCookieMaxAge,
+  setCookie,
+} from './auth';
+
+const ONE_YEAR_SEC = 365 * 24 * 60 * 60;
 
 function listen(app) {
   return new Promise(resolve => {
@@ -24,8 +32,7 @@ function getSetCookie(port, path) {
 
 async function main() {
   const maxAgeMs = sessionCookieMaxAge();
-  assert.strictEqual(typeof maxAgeMs, 'number');
-  assert.ok(maxAgeMs > 0, 'auth cookie must outlive the browser session');
+  assert.strictEqual(Math.floor(maxAgeMs / 1000), ONE_YEAR_SEC);
 
   const app = express();
   app.get('/login', (req, res) => {
@@ -38,10 +45,9 @@ async function main() {
 
   try {
     const header = await getSetCookie(port, '/login');
-    const maxAgeSec = Math.floor(maxAgeMs / 1000);
 
     assert.ok(header.includes('x-token=token-value'), header);
-    assert.ok(header.includes(`Max-Age=${maxAgeSec}`), header);
+    assert.ok(header.includes(`Max-Age=${ONE_YEAR_SEC}`), header);
     assert.ok(/HttpOnly/i.test(header), header);
     assert.ok(/SameSite=Lax/i.test(header), header);
     assert.ok(/Path=\//.test(header), header);
@@ -57,6 +63,9 @@ async function main() {
   });
   assert.strictEqual(cleared.length, 1);
   assert.strictEqual(cleared[0].opts.maxAge, undefined);
+
+  const decoded = jwt.decode(createAdminToken('admin-key', 'test-secret'));
+  assert.strictEqual(decoded.exp - decoded.iat, ONE_YEAR_SEC);
 }
 
 main().catch(err => {
