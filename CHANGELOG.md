@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.9](https://github.com/apostololeg/stat/compare/v2.3.8...v2.3.9) (2026-10-13)
+
 ### [2.3.8](https://github.com/apostololeg/stat/compare/v2.3.7...v2.3.8) (2026-10-11)
 
 
