@@ -1,11 +1,7 @@
 import { Router } from 'express';
 
-import {
-  COOKIE_TOKEN_NAME,
-  PRODUCTION,
-  SESSION_EXPIRED_AFTER,
-} from '../../config/const';
-import { encodeToken, isAdmin, setCookie } from '../api/auth';
+import { COOKIE_TOKEN_NAME, PRODUCTION } from '../../config/const';
+import { createAdminToken, isAdmin, setCookie } from '../api/auth';
 
 const router = Router();
 
@@ -28,11 +24,7 @@ export default router
       return res.status(403).send('Forbidden');
     }
 
-    setCookie(
-      res,
-      COOKIE_TOKEN_NAME,
-      encodeToken({ key }, { expiresIn: SESSION_EXPIRED_AFTER }),
-    );
+    setCookie(res, COOKIE_TOKEN_NAME, createAdminToken(key));
 
     res.redirect('/');
   });
