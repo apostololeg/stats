@@ -16,6 +16,7 @@ import S from './LiveBars.styl';
 import { LiveEventRow, truncateId } from './liveFilters';
 
 const PAGE_VIEWS_COLOR = '#22c55e';
+const TOP_PROJECTS_LIMIT = 7;
 
 const BAR_CHART_MARGIN = {
   top: 8,
@@ -56,9 +57,13 @@ export function LiveBars({ rows, className, rootRef }: Props) {
       byProject.set(row.pid, item);
     });
 
-    return [...byProject.values()].sort((a, b) =>
-      a.project.localeCompare(b.project),
-    );
+    return [...byProject.values()]
+      .sort(
+        (a, b) =>
+          b.events + b.pageViews - (a.events + a.pageViews) ||
+          a.project.localeCompare(b.project),
+      )
+      .slice(0, TOP_PROJECTS_LIMIT);
   }, [rows]);
 
   const labels = useMemo(
