@@ -80,6 +80,9 @@ export function LiveBars({ rows, className, rootRef }: Props) {
             fontSize={10}
             className={S.xAxis}
             interval={0}
+            angle={-30}
+            textAnchor="end"
+            height={44}
             tickFormatter={pid => labels[pid] ?? pid}
           />
           <YAxis fontSize={10} className={S.yAxis} allowDecimals={false} />

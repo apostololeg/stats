@@ -28,6 +28,10 @@ json('../../constants/layoutBreakpoints.json')
   opacity 0.45
 
 .charts
+  // Pull the charts left so the Y-axis labels sit as close to the edge as the charts' right side.
+  width calc(100% + 25px)
+  margin-left -25px
+
   // `> div` beats the chart roots' equal-specificity width/margin rules.
   > div
     width 100%
