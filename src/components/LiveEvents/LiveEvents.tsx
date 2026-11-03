@@ -1,6 +1,5 @@
 import {
   Button,
-  DatePickerInput,
   DateTime,
   GridLayout,
   LS,
@@ -19,6 +18,7 @@ import {
   useState,
 } from 'react';
 
+import { TimeRangeSelector } from 'components/UI/TimeRangeSelector/TimeRangeSelector';
 import { useStore } from 'justorm/react';
 import liveStore, { LiveEvent, useLive } from 'store/live';
 import { rangeBoundsMs } from 'store/reports';
@@ -418,17 +418,10 @@ export default function LiveEvents() {
               Last week
             </Button>
           )}
-          <DatePickerInput
-            size="s"
+          <TimeRangeSelector
             value={dateInterval}
             onChange={onDateIntervalChange}
-            buttonProps={{ round: true }}
-            popupProps={{
-              blur: true,
-              animation: false,
-              elevation: 1,
-              contentProps: { className: S.datePicker },
-            }}
+            datePickerClassName={S.datePicker}
           />
         </div>
         <span className={cn(S.status, S[live.status])}>

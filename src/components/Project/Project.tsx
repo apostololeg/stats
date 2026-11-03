@@ -1,17 +1,11 @@
-import {
-  Button,
-  DatePickerInput,
-  Icon,
-  LS,
-  Tooltip,
-  useDebounce,
-} from '@homecode/ui';
+import { Button, Icon, LS, Tooltip, useDebounce } from '@homecode/ui';
 import cn from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import EmbedButton from 'components/EmbedButton/EmbedButton';
 import { Container } from 'components/UI/Container/Container';
 import { Plot } from 'components/UI/Plot/Plot';
+import { TimeRangeSelector } from 'components/UI/TimeRangeSelector/TimeRangeSelector';
 import { useStore } from 'justorm/react';
 import { Report, buildInterval } from 'store/reports';
 import { useUser } from 'store/user';
@@ -37,7 +31,9 @@ export default function Project({ pathParams: { pid } }) {
   });
 
   const [report, setReport] = useState<Report | null>(null);
-  const [dateInterval, _setDateInterval] = useState(INITIAL_DATE_INTERVAL);
+  const [dateInterval, _setDateInterval] = useState<string[]>(
+    INITIAL_DATE_INTERVAL,
+  );
   const dateIntervalRef = useRef(dateInterval);
   const intervalStr = buildInterval(dateInterval[0], dateInterval[1]);
 
@@ -180,17 +176,10 @@ export default function Project({ pathParams: { pid } }) {
               Last week
             </Button>
           )}
-          <DatePickerInput
-            size="s"
+          <TimeRangeSelector
             value={dateInterval}
             onChange={onDateIntervalChange}
-            buttonProps={{ round: true }}
-            popupProps={{
-              blur: true,
-              animation: false,
-              elevation: 1,
-              contentProps: { className: S.datePicker },
-            }}
+            datePickerClassName={S.datePicker}
           />
           <Tooltip content="Update report" direction="bottom">
             <Button
