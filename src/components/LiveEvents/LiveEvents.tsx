@@ -84,6 +84,61 @@ function useSideBySideChartHeight() {
   return { barsRef, plotRef, height };
 }
 
+const TABLE_BOTTOM_GAP_PX = 20;
+const TABLE_MIN_HEIGHT_PX = 220;
+
+function getScrollParent(el: HTMLElement | null): HTMLElement | null {
+  let node = el?.parentElement ?? null;
+
+  while (node) {
+    const { overflowY } = getComputedStyle(node);
+    if (overflowY === 'auto' || overflowY === 'scroll') return node;
+    node = node.parentElement;
+  }
+
+  return null;
+}
+
+// Stretch the table down to the bottom of the visible page area, whatever
+// height the toolbar and charts above it end up taking.
+function useFillRemainingHeight() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const sync = () => {
+      const scroller = getScrollParent(el);
+      const viewTop = scroller ? scroller.getBoundingClientRect().top : 0;
+      const viewHeight = scroller ? scroller.clientHeight : window.innerHeight;
+      const scrollTop = scroller ? scroller.scrollTop : window.scrollY;
+      const top = el.getBoundingClientRect().top - viewTop + scrollTop;
+      const next = Math.max(
+        TABLE_MIN_HEIGHT_PX,
+        Math.floor(viewHeight - top - TABLE_BOTTOM_GAP_PX),
+      );
+
+      setHeight(prev => (prev === next ? prev : next));
+    };
+
+    const observer = new ResizeObserver(sync);
+    const root = el.parentElement;
+    if (root) observer.observe(root);
+    observer.observe(document.documentElement);
+    window.addEventListener('resize', sync);
+    sync();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', sync);
+    };
+  }, []);
+
+  return { ref, height };
+}
+
 const STATUS_LABEL = {
   idle: 'Idle',
   connecting: 'Connecting…',
@@ -142,6 +197,7 @@ export default function LiveEvents() {
   >(() => new Set());
   const seenEventIdsRef = useRef(new Set<string>());
   const { barsRef, plotRef, height: plotHeight } = useSideBySideChartHeight();
+  const { ref: tableWrapRef, height: tableHeight } = useFillRemainingHeight();
 
   const onVisibilityChange = useCallback(() => {
     const hidden = document.visibilityState === 'hidden';
@@ -441,10 +497,16 @@ export default function LiveEvents() {
           />
         </GridLayout>
 
-        <div className={S.tableWrap}>
+        <div
+          ref={tableWrapRef}
+          className={S.tableWrap}
+          style={tableHeight ? { height: tableHeight } : undefined}
+        >
           <Table className={S.table} columns={columns} data={filteredData} />
+          {filteredData.length === 0 && (
+            <p className={S.empty}>{emptyLabel}</p>
+          )}
         </div>
-        {filteredData.length === 0 && <p className={S.empty}>{emptyLabel}</p>}
       </div>
     </div>
   );

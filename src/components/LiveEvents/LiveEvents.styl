@@ -54,11 +54,18 @@ json('../../constants/layoutBreakpoints.json')
     background-color var(--warning-color-alpha-100, var(--accent-color-alpha-100))
 
 .tableWrap
+  position relative
   height calc(100 * var(--vh) - 540px)
   min-height 220px
   margin-top var(--indent-s)
   width 100%
   overflow hidden
+  user-select text
+  -webkit-user-select text
+
+  *
+    user-select text
+    -webkit-user-select text
 
   > div
     height 100%
@@ -91,36 +98,26 @@ json('../../constants/layoutBreakpoints.json')
     padding-top 2px
     padding-bottom 2px
 
-  th:nth-child(1),
-  td:nth-child(1)
-    min-width 7.5em
+  // Size columns to their content instead of stretching them across the
+  // full width: every column takes 1% (shrink-to-fit) and the last one
+  // absorbs the leftover space.
+  th,
+  td
+    width 1%
     white-space nowrap
+    padding-right 1.5em
+
+  th:last-child,
+  td:last-child
+    width auto
 
   th:nth-child(2),
   td:nth-child(2)
-    min-width 5em
-
-  th:nth-child(3),
-  td:nth-child(3)
-    min-width 8em
-
-  th:nth-child(4),
-  td:nth-child(4)
-    min-width 4.5em
-    white-space nowrap
-
-  th:nth-child(5),
-  td:nth-child(5)
-    min-width 6em
-
-  th:nth-child(6),
-  td:nth-child(6)
-    min-width 4.5em
-    white-space nowrap
+    min-width 0
 
 .headerCell
   display grid
-  grid-template-columns max-content minmax(0, 1fr)
+  grid-template-columns max-content auto
   align-items center
   column-gap 4px
   row-gap 4px
@@ -163,19 +160,27 @@ json('../../constants/layoutBreakpoints.json')
 
 .cellEllipsis
   display block
+  max-width 40em
   overflow hidden
   text-overflow ellipsis
   white-space nowrap
 
 .projectLink
   display block
+  max-width 14em
   overflow hidden
   text-overflow ellipsis
   white-space nowrap
 
 .empty
+  position absolute
+  top 3em
+  left 0
+  right 0
+  margin 0
+  text-align center
   opacity 0.6
-  margin-top var(--indent-s)
+  pointer-events none
 
 .table
   border-radius 14px
