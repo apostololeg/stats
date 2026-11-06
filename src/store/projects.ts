@@ -23,7 +23,9 @@ const STORE = createStore('projects', {
 
     try {
       const res = await api.get('/project');
-      this.items.push(...res.projects);
+      // Assign a new array: an in-place push keeps the same reference, so
+      // consumers memoized on `items` (e.g. LiveEvents) never recompute.
+      this.items = res.projects;
     } finally {
       this.isLoading = false;
       if (pid) this.loadingByPid[pid] = false;
@@ -41,7 +43,7 @@ const STORE = createStore('projects', {
         ...this.items.slice(index + 1),
       ];
     } else {
-      this.items.push(res.project);
+      this.items = [...this.items, res.project];
     }
   },
 
