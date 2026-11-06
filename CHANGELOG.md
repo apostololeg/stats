@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.11](https://github.com/apostololeg/stat/compare/v2.3.10...v2.3.11) (2026-11-06)
+
+
+### Bug Fixes
+
+* projects store - Replace items array so /live shows names on first load ([#7](https://github.com/apostololeg/stat/issues/7)) ([048ece4](https://github.com/apostololeg/stat/commit/048ece450663ded86fe2e57003261ee27e4dbfa3))
+
 ### [2.3.10](https://github.com/apostololeg/stat/compare/v2.3.9...v2.3.10) (2026-11-03)
 
 ### [2.3.9](https://github.com/apostololeg/stat/compare/v2.3.8...v2.3.9) (2026-10-13)
