@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.12](https://github.com/apostololeg/stat/compare/v2.3.11...v2.3.12) (2026-11-14)
+
+
+### Features
+
+* **live:** cap Name cells at 300px with deferred tooltip ([#9](https://github.com/apostololeg/stat/issues/9)) ([7cb90bb](https://github.com/apostololeg/stat/commit/7cb90bb4f541d4efa4fc78d0e0f32cc088ef394e))
+
 ### [2.3.11](https://github.com/apostololeg/stat/compare/v2.3.10...v2.3.11) (2026-11-06)
 
 
