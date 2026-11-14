@@ -164,6 +164,16 @@ json('../../constants/layoutBreakpoints.json')
   text-overflow ellipsis
   white-space nowrap
 
+.nameText
+  white-space nowrap
+
+// The over-trigger tooltip forces its width to the cell's and lets text
+// wrap (inline styles); keep the full name on one line instead.
+:global([popover]):has(.nameText)
+  width max-content !important
+  max-width none !important
+  white-space nowrap !important
+
 .projectLink
   display block
   max-width 14em
