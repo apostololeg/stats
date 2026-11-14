@@ -5,6 +5,7 @@ import {
   LS,
   Link,
   Table,
+  TextWithDeferTooltip,
   useDebounceCallback,
   useEvent,
 } from '@homecode/ui';
@@ -421,9 +422,9 @@ export default function LiveEvents() {
           />
         ),
         render: ({ name }: LiveEventRow) => (
-          <span className={S.cellEllipsis} title={name}>
-            {name}
-          </span>
+          <TextWithDeferTooltip className={S.nameCell} overTrigger>
+            <span className={S.nameText}>{name}</span>
+          </TextWithDeferTooltip>
         ),
       },
       {
