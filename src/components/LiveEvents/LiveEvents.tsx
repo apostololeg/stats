@@ -422,7 +422,7 @@ export default function LiveEvents() {
           />
         ),
         render: ({ name }: LiveEventRow) => (
-          <TextWithDeferTooltip className={S.nameCell}>
+          <TextWithDeferTooltip className={S.nameCell} overTrigger>
             {name}
           </TextWithDeferTooltip>
         ),
