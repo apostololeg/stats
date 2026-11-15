@@ -3,6 +3,10 @@ import { type Ref, useMemo } from 'react';
 
 import { activeColor } from 'components/App/store';
 import {
+  ChartTooltip,
+  ChartTooltipLabel,
+} from 'components/UI/ChartTooltip/ChartTooltip';
+import {
   Line,
   LineChart,
   ResponsiveContainer,
@@ -128,11 +132,11 @@ export function LivePlot({
             content={d => {
               const { value, payload } = d.payload?.[0] ?? {};
               return (
-                <div className={S.tooltip}>
+                <ChartTooltip>
                   <b>{value}</b>
                   <br />
-                  <span className={S.tooltipLabel}>{payload?.label}</span>
-                </div>
+                  <ChartTooltipLabel>{payload?.label}</ChartTooltipLabel>
+                </ChartTooltip>
               );
             }}
           />
