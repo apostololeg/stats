@@ -3,6 +3,10 @@ import { type Ref, useMemo } from 'react';
 
 import { activeColor } from 'components/App/store';
 import {
+  ChartTooltip,
+  ChartTooltipLabel,
+} from 'components/UI/ChartTooltip/ChartTooltip';
+import {
   Bar,
   BarChart,
   Legend,
@@ -93,13 +97,13 @@ export function LiveBars({ rows, className, rootRef }: Props) {
               if (!row) return null;
 
               return (
-                <div className={S.tooltip}>
-                  <span className={S.tooltipLabel}>{row.project}</span>
+                <ChartTooltip>
+                  <ChartTooltipLabel>{row.project}</ChartTooltipLabel>
                   <br />
                   <b>{row.events}</b> events
                   <br />
                   <b>{row.pageViews}</b> page views
-                </div>
+                </ChartTooltip>
               );
             }}
           />

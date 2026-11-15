@@ -2,6 +2,10 @@ import cn from 'classnames';
 
 import { Line, LineChart, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
 import { activeColor } from 'components/App/store';
+import {
+  ChartTooltip,
+  ChartTooltipLabel,
+} from 'components/UI/ChartTooltip/ChartTooltip';
 
 import S from './Plot.styl';
 import { DateTime } from '@homecode/ui';
@@ -47,15 +51,15 @@ export function Plot({ data, className }: Props) {
             content={d => {
               const { value, name, payload } = d.payload?.[0] ?? {};
               return (
-                <div className={S.tooltip}>
+                <ChartTooltip>
                   <b>{value}</b>
                   <br />
-                  <span className={S.tooltipLabel}>
+                  <ChartTooltipLabel>
                     <DateTime value={payload?.date} format="fromNow" />
-                  </span>
+                  </ChartTooltipLabel>
                   &nbsp;
                   <p className={S.fillDate}>{payload?.date}</p>
-                </div>
+                </ChartTooltip>
               );
             }}
           />
