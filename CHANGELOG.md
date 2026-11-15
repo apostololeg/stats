@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.13](https://github.com/apostololeg/stat/compare/v2.3.12...v2.3.13) (2026-11-15)
+
+
+### Features
+
+* **charts:** share one tooltip style across charts ([#11](https://github.com/apostololeg/stat/issues/11)) ([5029973](https://github.com/apostololeg/stat/commit/50299736977ec688cec98d7c00243a39fc6d4528))
+
 ### [2.3.12](https://github.com/apostololeg/stat/compare/v2.3.11...v2.3.12) (2026-11-14)
 
 
